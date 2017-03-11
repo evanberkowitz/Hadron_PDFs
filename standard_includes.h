@@ -22,5 +22,6 @@
 #include <cmath>
 #include <limits>
 
+#include "macro/lattice.h"
 
 #endif // _STANDARD_INCLUDES
