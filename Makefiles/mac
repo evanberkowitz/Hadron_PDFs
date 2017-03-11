@@ -1,0 +1,109 @@
+######
+###### Compiler and environment description
+######
+
+CC:=mpicc
+CXX:=mpicxx
+MAC:=1
+OPT:= -O3
+OPENMP:=1
+
+######
+###### Dependency Paths
+######
+
+DIR_USQCD:=/Users/evanberkowitz/USQCD/install
+DIR_QMP:=$(DIR_USQCD)/qmp
+DIR_QDP:=$(DIR_USQCD)/qdpxx
+DIR_CHROMA:=$(DIR_USQCD)/chroma
+DIR_XML2:=$(DIR_USQCD)/libxml2
+DIR_FFTW:=/usr/local
+
+DIR_INSTALL:=.
+
+######
+###### Capture GIT information:
+######
+
+DEF_GIT=-DGIT_BRANCH="\"$(shell git rev-parse --abbrev-ref HEAD)\"" -DGIT_LATEST_COMMIT="\"$(shell git log -n 1 --pretty='%H')\"" -DGIT_COMMIT_TIME="\"$(shell git log --pretty='%ci' -n 1)\"" -DGIT_PORCELAIN="\"$(shell git status --porcelain 2>/dev/null| wc -l | tr -d [:blank:])\""
+
+######
+###### OpenMP
+######
+
+ifeq ($(OPENMP),1)
+FLAG_OMP:=-fopenmp
+else
+FLAG_OMP:=
+endif
+
+######
+###### FFT
+######
+
+ifeq ($(MKL),1)
+INCLUDES_FFT:=-I$(MKLROOT)/include/fftw
+LDFLAGS_FFT:=-mkl
+else
+INCLUDES_FFT:=-I$(DIR_FFTW)
+LDFLAGS_FFT:=-L$(DIR_FFTW)
+LIB_FFT:=-lfftw3_threads -lfftw3
+endif
+
+######
+###### BLAS
+######
+
+LIB_BLAS:=-lblas
+
+######
+###### INCLUDES
+######
+
+INCLUDES:=-I. $(shell $(DIR_CHROMA)/bin/chroma-config --cxxflags) $(INCLUDES_FFT) -I$(DIR_CHROMA)/include -I$(DIR_QDP)/include -I$(DIR_QDP)/other_libs/qio/include -I$(DIR_QDP)/other_libs/clime/include -I$(DIR_QDP)/other_libs/xpath_reader/include -I$(DIR_XML2)/include -I$(DIR_QMP)/include
+
+######
+###### LIBRARIES
+######
+
+LIBS:=$(shell $(DIR_CHROMA)/bin/chroma-config --ldflags) $(shell $(DIR_CHROMA)/bin/chroma-config --libs) -ldl $(LIB_FFT)
+
+######
+###### DEFINES
+######
+
+DEFS:=-DDEBUG -DBLAS_TRAILING_UNDERSCORE $(DEF_GIT) -D_GLIBC_USE_CXX1_ABI=0
+
+######
+###### FLAGS
+######
+
+FLAGS_C =   $(FLAG_OMP) -std=gnu99 -march=native -ffunction-sections -fdata-sections $(DEFS) $(OPT) $(INCLUDES)
+FLAGS_CXX = $(FLAG_OMP) -ffunction-sections -fdata-sections $(DEBUG) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
+FLAGS_LD =  $(FLAG_OMP) #-Wl,--gc-sections
+
+ifeq ($(MKL),1)
+FLAGS_C+=-mkl
+FLAGS_CXX+=-mkl
+endif
+
+######
+###### OBJECTS
+######
+
+OBJECTS:=
+
+######
+###### TARGETS
+######
+
+%.o : %.cc
+	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
+
+test.x: $(OBJECTS) test.o
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test.o -o test.x $(LIBS)
+
+
+clean:
+	rm -f *.o *.x
+	rm -f PP/*.o PP/*.x
