@@ -53,3 +53,4 @@ TBD.
 [QMP]:      https://github.com/usqcd-software/qmp
 [QDPXX]:    http://usqcd-software.github.io/qdpxx/
 [CHROMA]:   https://github.com/JeffersonLab/chroma
+[HDF5]:     https://www.hdfgroup.org/hdf5/
