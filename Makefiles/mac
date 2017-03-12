@@ -91,7 +91,7 @@ endif
 ###### OBJECTS
 ######
 
-OBJECTS:=
+OBJECTS:=include/Path.o
 
 ######
 ###### TARGETS
@@ -106,4 +106,4 @@ test.x: $(OBJECTS) test.o
 
 clean:
 	rm -f *.o *.x
-	rm -f PP/*.o PP/*.x
+	rm -f includes/*.o includes/*.x
