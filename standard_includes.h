@@ -1,5 +1,5 @@
-#ifndef _STANDARD_INCLUDES
-#define _STANDARD_INCLUDES
+#ifndef _HADRON_PDFS_STANDARD_INCLUDES
+#define _HADRON_PDFS_STANDARD_INCLUDES
 
 
 #ifdef _OPENMP
@@ -22,6 +22,8 @@
 #include <cmath>
 #include <limits>
 
+#include "version.h"
 #include "macro/lattice.h"
+#include "utility/banner.h"
 
-#endif // _STANDARD_INCLUDES
+#endif // _HADRON_PDFS_STANDARD_INCLUDES
