@@ -83,6 +83,15 @@ multi2d<int> path_expand(const multi2d<int> &P){
     return result;
 }
 
+multi1d<int> disp(const multi2d<int> &P){
+    multi1d<int> result(Nd);
+    for_direction(d) result[d]=0;
+    for(int r=0; r<P.nrows(); r++){
+        for_direction(d) result[d]+=P[r][d];
+    }
+    return result;
+}
+
 Path::Path(){
     
     zero_path=true;
@@ -125,7 +134,8 @@ Path::Path(const multi2d<int> &P){
     }
 
     compressed=path_compress(P);
-    
+    displacement=disp(compressed);
+
     if( compressed.nrows() == 0){
         zero_path=true;
         dx.resize(0,Nd);
@@ -139,12 +149,64 @@ Path::Path(const multi2d<int> &P){
 
 Path::Path(const std::string  &P){
     START_CODE();
-    QDPIO::cout << "PLACEHOLDER STRING CONSTRUCTOR FOR PATH" << std::endl;
-    zero_path=true;
-    compressed.resize(0,Nd);
-    dx.resize(0,Nd);
-    displacement.resize(Nd);
-    for_direction(d) displacement[d]=0;
+    
+    // Delete all whitespace.
+    std::string no_whitespace="";
+    for( int i = 0; i < P.length(); i++){
+        std::string c=P.substr(i,1);
+        if( " " != c && "\t" != c && "\n" != c) no_whitespace+=c;
+    }
+
+    // Count how many semicolon-terminated tokens we have:
+    int tokens=0;
+    for( int i = 0; i < no_whitespace.length(); i++){
+        if( ';' == no_whitespace[i] ) tokens++;
+    }
+    // The user might forget the final semicolon.  Check and repair:
+    if( ";" != no_whitespace.substr(no_whitespace.size()-1,1)){ tokens++; no_whitespace+=";"; }
+
+    // Zero out a temporary array to store parsed results:
+    multi2d<int> temp(tokens, Nd);
+    for(int r =0; r < tokens; r++){
+        for_direction(d) temp[r][d]=0;
+    }
+
+    int start=0, end=-1, separator=0, dir=0, steps=0, row=0;
+    std::string dir_string, steps_string;
+    
+    // For every token,
+    for( int token = 0; token < tokens; token++){
+        // Begin just after the previous token ended,
+        start=end+1;
+        end=start;
+        // find the end of the token and the colon separator,
+        while( no_whitespace.substr(end,1) != ";"){
+            if( ":" == no_whitespace.substr(end,1) ) separator=end;
+            end++;
+        }
+        if( separator < start ){ // We didn't find a colon before the next semicolon!
+            QDPIO::cout << "Paths can only be constructed from semicolon-separated direction:steps paths." << std::endl;
+            QDP_abort(EXIT_FAILURE);
+        }
+        
+        // Extract the substrings,
+        dir_string=no_whitespace.substr(start,separator-start);
+        steps_string=no_whitespace.substr(separator+1,end-separator-1);
+        // turn them into integers,
+        dir=std::stoi(dir_string);  
+        steps=std::stoi(steps_string);
+        // put them into the temporary array
+        temp[row][dir]=steps;
+        // and move on to the next row in the array.
+        row++;
+    }
+
+    compressed=path_compress(temp);
+    dx=path_expand(compressed);
+    displacement=disp(compressed);
+    zero_path=(compressed.nrows() == 0);
+
+
     END_CODE();
 }
 
