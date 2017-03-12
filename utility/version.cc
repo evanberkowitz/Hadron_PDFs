@@ -1,19 +1,4 @@
-#ifndef _VERSION_H
-#define _VERSION_H
-
-#define my_str(s) #s
-
-#ifndef GIT_BRANCH
-#define GIT_BRANCH "unspecified"
-#endif
-
-#ifndef GIT_LATEST_COMMIT
-#define GIT_LATEST_COMMIT "unspecified"
-#endif
-
-#ifndef GIT_COMMIT_TIME
-#define GIT_COMMIT_TIME "unspecified"
-#endif
+#include "utility/version.h"
 
 std::string Hadron_PDFs_compilation(){
     std::string info="HADRON_PDFs INFO\n";
@@ -30,5 +15,3 @@ std::string Hadron_PDFs_compilation(){
 
     return info;
 }
-
-#endif // _VERSION_H

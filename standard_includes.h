@@ -22,7 +22,7 @@
 #include <cmath>
 #include <limits>
 
-#include "version.h"
+#include "utility/version.h"
 #include "macro/lattice.h"
 #include "utility/banner.h"
 
