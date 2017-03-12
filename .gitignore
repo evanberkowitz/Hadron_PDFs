@@ -31,3 +31,6 @@
 
 # Makefile
 Makefile
+
+# vi edited files
+*~
