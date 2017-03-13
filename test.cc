@@ -1,6 +1,6 @@
 #include "standard_includes.h"
 #include "include/Path.h"
-
+#include "include/WilsonLine.h"
 
 int main(int argc, char **argv){
     
@@ -18,14 +18,28 @@ int main(int argc, char **argv){
     lattice_size[3]=8;
     Layout::setLattSize(lattice_size);
     Layout::create();
-    
+
+
+
+
+
+
+
+
+
     QDPIO::cout << banner("Macros") << std::endl;
     
     QDPIO::cout << "Testing for_direction macro: ";
     for_direction(dir) QDPIO::cout << dir << " ";
     QDPIO::cout << std::endl;
-    
-    
+
+
+
+
+
+
+
+
     QDPIO::cout << banner("Testing Path") << std::endl;
     multi2d<int> test_path_0(10,Nd), test_path_1(10, Nd), test_path_2(10,Nd);
     for( int r=0; r < test_path_0.nrows(); r++ ){
@@ -85,8 +99,67 @@ int main(int argc, char **argv){
     QDPIO::cout << "Long :" << P4.long_string()  << std::endl;
     QDPIO::cout << "Displacment: " ; for_direction(d) QDPIO::cout << P4.total_displacement()[d] << " "; QDPIO::cout << std::endl;
 
-    
-    QDPIO::cout << banner("Finalizing") << std::endl;
+
+
+
+    // QDPIO::cout << banner("gauge_shift") << std::endl;
+    //
+    // QDPIO::cout << "Create a non-interacting gauge field..." << std::flush;
+    // Real one=1.0;
+    // multi1d<LatticeColorMatrix> links(Nd);
+    // for_direction(d){ links[d] = one; }
+    // QDPIO::cout << "done!" << std::endl;
+    //
+    // QDPIO::cout << "Create multi1d<int>s for O the origin and for N the neighbor" << std::endl;
+    // multi1d<int> origin(Nd);
+    // multi1d<int> neighbor(Nd);
+    // for_direction(d){ origin[d] = 0; neighbor[d] = 0; }
+    // neighbor[0] = 1;
+    // QDPIO::cout << "O: " << std::flush; for_direction(d) QDPIO::cout << origin[d] << " " << std::flush;  QDPIO::cout << std::endl;
+    // QDPIO::cout << "N: " << std::flush; for_direction(d) QDPIO::cout << neighbor[d] << " " << std::flush;  QDPIO::cout << std::endl;
+    //
+    // LatticeColorMatrix U=zero;
+    // ColorMatrix color_temp=zero;
+    // Real r = 0.723;  // chosen randomly :)
+    // QDPIO::cout << "We set U to be " << r << " times the unit matrix at the origin:" << std::endl;
+    // for(int c1 = 0; c1 < 3; c1++){
+    //     pokeColor(color_temp,r,c1,c1);
+    // }
+    // pokeSite(U, color_temp, origin);
+    // for(int c1 = 0; c1 < 3; c1++){
+    //     for(int c2 = 0; c2 < 3; c2++){
+    //         QDPIO::cout << peekColor(peekSite(U,origin),c1,c2) << " ";
+    //     }
+    //     QDPIO::cout << std::endl;
+    // }
+    //
+    //
+    // int s   = -1;
+    // int dir = 0;
+    //
+    // QDPIO::cout << "Now let V <-- gauge transport of U with sign " << s << " along direction " << dir << std::endl;
+    // LatticeColorMatrix V=gauge_shift(links, U, s, dir);
+    // QDPIO::cout << "In V we " << ( s > 0 ? "expect" : "don't expect") << " to see something" << std::endl;
+    // for(int c1 = 0; c1 < 3; c1++){
+    //     for(int c2 = 0; c2 < 3; c2++){
+    //         QDPIO::cout << peekColor(peekSite(V,neighbor),c1,c2) << " ";
+    //     }
+    //     QDPIO::cout << std::endl;
+    // }
+
+
+
+    QDPIO::cout << banner("WilsonLine") << std::endl;
+
+    WilsonLine L1(test_path_1);
+    QDPIO::cout << "L1 is the same as P1." << std::endl;
+    QDPIO::cout << "P1: " << P1.short_string() << std::endl;
+    QDPIO::cout << "L1: " << L1.short_string() << std::endl;
+
+
+
+
+    QDPIO::cout << banner("Finalize") << std::endl;
     Chroma::finalize();
     QDPIO::cout << "done!" << std::endl;
     

@@ -91,7 +91,7 @@ endif
 ###### OBJECTS
 ######
 
-OBJECTS:=utility/version.o utility/banner.o include/Path.o
+OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o
 
 ######
 ###### TARGETS
