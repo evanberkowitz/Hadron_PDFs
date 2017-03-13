@@ -65,16 +65,21 @@ multi2d<int> path_expand(const multi2d<int> &P){
         for_direction(d) unit_steps+=abs(P[r][d]);
     }
     
+    // Create and zero-out an array to store the answer.
     multi2d<int> result(unit_steps,Nd);
     for(int r=0; r < unit_steps; r++){
         for_direction(d) result[r][d]=0;
     }
     
+    
     int row=0;
+    // For each step of arbitrary length
     for(int r=0; r < P.nrows(); r++){
         for_direction(d){
+            // unwind it into unit steps
             for(int step=0; step < abs(P[r][d]); step++){
-                result[row][d] = (0 < P[r][d]) - (P[r][d] < 0); // A fancy, branch-free way of writing the sign function.
+                result[row][d] = sign(P[r][d]);
+                // and store each unit step in its own row.
                 row++;
             }
         }
@@ -105,6 +110,23 @@ Path::Path(){
     }
     
 }
+
+Path::Path(const Path &p){
+    zero_path=p.zero_path;
+
+    for_direction(d) displacement[d]=p.displacement[d];
+
+    dx.resize(p.dx.nrows(),p.dx.ncols());
+    for(int r = 0; r < dx.nrows(); r++){
+        for_direction(d) dx[r][d] = p.dx[r][d];
+    }
+
+    compressed.resize(p.compressed.nrows(),p.compressed.ncols());
+    for(int r = 0; r < compressed.nrows(); r++){
+        for_direction(d) compressed[r][d] = p.compressed[r][d];
+    }
+
+};
 
 Path::Path(const multi2d<int> &P){
     START_CODE();

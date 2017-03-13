@@ -12,6 +12,9 @@ public:
     // There's a default constructor which creates a path that's zero steps.
     Path(); 
     
+    // There's a copy constructor
+    Path(const Path &p);
+    
     // A path can be built from a 2-dimensional set of integers.
     // There can be any number of rows, and each row should be Nd columns wide---one integer for each spacetime direction.
     // Every entry but one must be zero (so that the path is along a lattice direction).
@@ -33,7 +36,7 @@ public:
 
     // You can destroy a path.
    ~Path(){  };
-private:
+protected:
     bool zero_path;
     multi2d<int> dx;
     multi2d<int> compressed;

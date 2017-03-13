@@ -22,8 +22,9 @@
 #include <cmath>
 #include <limits>
 
-#include "utility/version.h"
 #include "macro/lattice.h"
 #include "utility/banner.h"
+#include "utility/sign.h"
+#include "utility/version.h"
 
 #endif // _HADRON_PDFS_STANDARD_INCLUDES
