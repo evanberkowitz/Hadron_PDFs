@@ -34,3 +34,6 @@ Makefile
 
 # vi edited files
 *~
+
+# Mac OS nonsense
+.DS_Store
