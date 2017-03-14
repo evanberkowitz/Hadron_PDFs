@@ -29,6 +29,7 @@ int main(int argc, char **argv){
     QDPIO::cout << "             Apply the incoming photon vertex to the propagator." << std::endl;
     QDPIO::cout << "             Parallel transport the propagator along the path." << std::endl;
     QDPIO::cout << "             Apply the outgoing photon vertex to the propagator." << std::endl;
+    QDPIO::cout << "             Re-solve the Dirac equation using that propagator as the source." << std::endl;
     QDPIO::cout << "             Use that propagator (and the original propagator) to build the pion and nucleon correlators.  Fourier transform." << std::endl;
     QDPIO::cout << "             This yields full-volume correlators, " << std::endl;
     QDPIO::cout << "                  <   destroyed with every momentum (p)" << std::endl;
