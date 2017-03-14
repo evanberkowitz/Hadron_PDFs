@@ -97,7 +97,7 @@ OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o 
 ###### TESTS
 ######
 
-TESTS=tests/macro/timed.o
+TESTS=tests/macro/timed.o tests/macro/lattice.o
 
 ######
 ###### TARGETS
@@ -110,7 +110,8 @@ test.x: $(OBJECTS) test.o
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test.o -o test.x $(LIBS)
 	
 tests: $(OBJECTS) $(TESTS)
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) $(TESTS) -o tests/macro/timed.x $(LIBS)
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) tests/macro/lattice.o -o tests/macro/lattice.x $(LIBS)
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) tests/macro/timed.o   -o tests/macro/timed.x $(LIBS)
 
 Hadron_PDFs.x: $(OBJECTS) Hadron_PDFs.o
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) Hadron_PDFs.o -o Hadron_PDFs.x $(LIBS)
