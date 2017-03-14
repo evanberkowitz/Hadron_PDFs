@@ -24,6 +24,7 @@
 
 #include "macro/lattice.h"
 #include "utility/banner.h"
+#include "utility/int_to_string.h"
 #include "utility/sign.h"
 #include "utility/version.h"
 
