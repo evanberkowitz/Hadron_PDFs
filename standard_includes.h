@@ -23,6 +23,7 @@
 #include <limits>
 
 #include "macro/lattice.h"
+#include "macro/timed.h"
 #include "utility/banner.h"
 #include "utility/int_to_string.h"
 #include "utility/sign.h"
