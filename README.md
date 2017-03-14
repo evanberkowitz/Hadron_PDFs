@@ -24,7 +24,7 @@ Parton Distribution Functions, or PDFs, are functions that characterize the inne
 
 The [Feynman-Hellman (FH) method][fh] is a technique for measuring hadronic matrix elements, normally requiring a three-point function, into a two-point function which can be analyzed with familiar effective-mass techniques.  Here we apply this technique to PDFs.
 
-The FH method works by computing *continued propagators*---applying an operator to an already-computed propagator, and then using the result as a source for another propagator.
+The FH method works by computing *sequential* or *Feynman-Hellman propagators*---applying an operator to an already-computed propagator, and then using the result as a source for another propagator.
 
 Here, the operator we apply is: injecting a given momentum, transporting a quark along a (spatial) path via the gauge links, and then emitting a (possibly-different) momentum.
 
