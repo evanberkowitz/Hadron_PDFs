@@ -25,8 +25,11 @@ int main(int argc, char **argv){
         }
     }
     QDPIO::cout << (pass ? "PASS!" : "FAIL!") << std::endl;
+    if( ! pass ){ QDP_abort(EXIT_FAILURE); }
 
-    QDPIO::cout << "Testing zero             ... " << ( sign(0) == 0 ? "PASS!" : "FAIL!") << std::endl;
+    pass = ( sign(0) == 0 );
+    QDPIO::cout << "Testing zero             ... " << ( pass ? "PASS!" : "FAIL!") << std::endl;
+    if( ! pass ){ QDP_abort(EXIT_FAILURE); }
 
     QDPIO::cout << "Testing negative integers... " << std::flush;
     pass=true;
@@ -39,6 +42,9 @@ int main(int argc, char **argv){
         }
     }
     QDPIO::cout << (pass ? "PASS!" : "FAIL!") << std::endl;
-
+    if( ! pass ){ QDP_abort(EXIT_FAILURE); }
+    
+    Chroma::finalize();
+    return 0;
 
 }
