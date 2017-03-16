@@ -97,7 +97,7 @@ OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o 
 ###### TESTS
 ######
 
-TESTS=test/macro/timed.o test/macro/lattice.o test/utility/sign.o test/utility/version.o
+TESTS=test/macro/timed.o test/macro/lattice.o test/utility/sign.o test/utility/version.o test/include/Path.o
 
 ######
 ###### TARGETS
@@ -106,18 +106,17 @@ TESTS=test/macro/timed.o test/macro/lattice.o test/utility/sign.o test/utility/v
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
-Hadron_PDFs.x: $(OBJECTS) Hadron_PDFs.o
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) Hadron_PDFs.o -o Hadron_PDFs.x $(LIBS)
+%.x : $(OBJECTS) %.o 
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) $*.o -o $*.x $(LIBS)
 
-test.x: $(OBJECTS) test.o
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test.o -o test.x $(LIBS)
+tests :
+	make test/macro/{lattice,timed}.x 
+	make test/utility/{sign,version}.x 
 	
-tests: $(OBJECTS) $(TESTS)
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test/macro/lattice.o               -o test/macro/lattice.x              $(LIBS)
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test/macro/timed.o                 -o test/macro/timed.x                $(LIBS)
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test/utility/sign.o                -o test/utility/sign.x               $(LIBS)
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) test/utility/version.o             -o test/utility/version.x            $(LIBS)
+all:
+	make Hadron_PDFs.x
+	make tests
 
 clean:
 	rm -f *.o *.x
-	rm -f {include,utility}/*.{o,x}
+	rm -f {include,utility,test/*/}/*.{o,x}
