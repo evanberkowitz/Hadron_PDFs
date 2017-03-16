@@ -112,5 +112,5 @@ all:
 	make tests
 
 clean:
-	rm -f *.o *.x
-	rm -f {include,utility,test/*/}/*.{o,x}
+	find . -name '*.o' -delete
+	find . -name '*.x' -delete
