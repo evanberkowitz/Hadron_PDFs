@@ -6,7 +6,7 @@ std::string multi2d_int_to_string(const multi2d<int> &P){
     if( P.nrows() == 0) return "ZERO";
     for(int r=0; r<P.nrows(); r++){
         for_direction(d){
-            if( P[r][d] != 0) result+=int_to_string(d)+": "+int_to_string(P[r][d])+"; ";
+            if( P[r][d] != 0) result+=int_to_string(d)+":"+int_to_string(P[r][d])+";";
         }
     }
     return result;
