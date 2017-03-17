@@ -3,7 +3,7 @@ Computing Hadronic PDFs with the FH technique.
 
 We aim to compute hadronic parton distribution functions using the Feynman-Hellman technique.
 
-#Table of Contents
+# Table of Contents
 
 - [Hadron_PDFs](#hadron_pdfs)
 - [Table of Contents](#table-of-contents)
@@ -16,11 +16,11 @@ We aim to compute hadronic parton distribution functions using the Feynman-Hellm
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 
-#Introduction
+# Introduction
 
 Parton Distribution Functions, or PDFs, are functions that characterize the inner structure of hadrons, bound states quarks (and antiquarks) in QCD.
 
-#Method
+# Method
 
 The [Feynman-Hellman (FH) method][fh] is a technique for measuring hadronic matrix elements, normally requiring a three-point function, into a two-point function which can be analyzed with familiar effective-mass techniques.  Here we apply this technique to PDFs.
 
@@ -31,19 +31,19 @@ Here, the operator we apply is: injecting a given momentum, transporting a quark
 # Code
 
 
-##Dependencies
+## Dependencies
 
 `Hadron_PDFs` is built on top of [the USQCD software stack][USQCD].  In particular, it requires [`QMP`][QMP], [`QDP++`][QDPXX] with [`HDF5`][HDF5], and [`Chroma`][CHROMA].
 
-##Installation
+## Installation
 
-##Running
+## Running
 
-#Acknowledgements
+# Acknowledgements
 
 This software was developed by Evan Berkowitz, Xiaonu Xiong, and Tom Luu at Forschungszentrum Jülich.
 
-#License
+# License
 
 TBD.
 
