@@ -97,6 +97,7 @@ OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o 
 ###### TARGETS
 ######
 
+.PRECIOUS: %.o
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
@@ -107,10 +108,12 @@ tests :
 	make test/macro/{lattice,timed}.x 
 	make test/utility/{sign,version}.x 
 	
+.PHONY: all
 all:
 	make Hadron_PDFs.x
 	make tests
 
+.PHONY: clean
 clean:
 	find . -name '*.o' -delete
 	find . -name '*.x' -delete
