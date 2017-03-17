@@ -14,6 +14,7 @@ class WilsonLine : public Path {
 public:
     WilsonLine(const Path &P) : Path(P) {};
     WilsonLine(const multi2d<int> &P) : Path(P) {};
+    WilsonLine(const std::string &P) : Path(P) {};
     // using Path::Path;
     LatticeColorMatrix operator()(const multi1d<LatticeColorMatrix> &U);
 

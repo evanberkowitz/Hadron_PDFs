@@ -28,7 +28,46 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     // Therefore, if we want result(x+µ) = U^µ(x) * v(x), we need a negative QDP++ shift,
     // result(x) = U^µ(x-µ) * v(x-µ)
     // This is exactly the opposite of what *I* mean by a shift.
-    return sign > 0 ? shift(U[dir] * v, -1, dir) : shift(adj(shift(U[dir], -1, dir)) * v, +1, dir);
+
+    // Consider this code from Chroma::MesPlq for computing the plaquette:
+    //
+    // sum(real(trace(u[mu]*shift(u[nu],FORWARD,mu)*adj(shift(u[mu],FORWARD,nu))*adj(u[nu]))))
+    //
+    // Here is a picture:
+    //
+    //        x + nu ------ U[mu](x+nu) --> x + nu + mu
+    //          ^                               ^
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //       U[nu](x)                       U[nu](x+mu)
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //          x    ------- U[mu](x) ------> x + mu
+    //
+    // Now, consider the multiplication of u[mu] * shift(u[nu], FORWARD, mu).
+    // u[mu] is the link on the bottom of my picture.  In must have gauge indices at x and x+mu.
+    // shift(u[nu], FORWARD, mu) is the link on the right side of my picture.
+    // It must have gauge indices at x + mu and x + mu + nu.
+    // In order to perform a sensible operation from the gauge-group point of view, we can only multiply indices that live on the same site!
+    // So, that means the RIGHT index of u[mu] lives at x + mu, because it is multiplied on the right by u[nu](x+mu).
+    // So, the "here" index is the left index, and the "there" index is the right index,
+    //
+    // EXACTLY THE OPPOSITE OF HOW YOU WOULD WRITE IN PHYSICS:  PSI(x+mu) = U[mu](x) * PSI(x)
+    //
+    // Since the indices are backwards, we need to multiply like (vector) * (link) rather than (link) * (vector).
+    //
+    // Shifting in the positive direction isn't so bad.
+    // v(x) * U[dir](x) has gauge indices as x+dir.  We want those indices to land at x+dir, so we need shift( _, -1, dir).
+    //
+    // Shifting in the negative direction is a little subtle.
+    // U[dir](x-mu) has gauge indices at x-mu and x.  But we want to backtrack that link, so we need adj(U).  
+    // But adj has a transpose in it, so U adjoing has gauge indices at x and x-mu.  
+    // The best way to compute this is to shift v to x-mu and then multiply by adj(U).
+    // return sign > 0 ? shift( v * U[dir], -1, dir) : shift( v * adj(shift(U[dir], -1, dir)) , +1, dir);
+    return sign > 0 ? shift( v * U[dir], -1, dir) : shift(v, +1, dir) * adj(U[dir]) ;
 }
 
 LatticeColorMatrix WilsonLine::operator()(const multi1d<LatticeColorMatrix> &U){
