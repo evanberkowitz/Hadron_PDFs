@@ -15,11 +15,13 @@ public:
     multi1d<int> operator()( const multi1d<int> &x, int sign=1 ) const {
         // and produces the coordinates where data that lands at that location should originate from.
         multi1d<int> temp(Nd);
-        for(int d = 0 ; d < Nd; d++)
+        for(int d = 0 ; d < Nd; d++){
         // Note that this is the opposite of what we want---we have specified where the data we have should go.
         // Therefore, just as in WilsonLine.cc we need the opposite sign.  This way data at 0 will go to displacement,
         // rather than vice-versa.
-        temp[d]=x[d] - sign*displacement[d];        // TODO: Do I need to mod by the length of the lattice direction?
+        temp[d]=x[d] - sign*displacement[d];
+        temp[d]=temp[d] % Layout::lattSize()[d];
+        }
         return temp;
     };
     
