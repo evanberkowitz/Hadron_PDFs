@@ -19,9 +19,11 @@
 class ParallelTransporter {
 public:
     ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const Path &P);
+    ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const std::string P);
     LatticeReal         operator()(const LatticeReal        &R, bool antiperiodic=false);
     LatticeComplex      operator()(const LatticeComplex     &C, bool antiperiodic=false);
     LatticeColorVector  operator()(const LatticeColorVector &V, bool antiperiodic=false);
+    LatticeColorMatrix  operator()(const LatticeColorMatrix &M, bool antiperiodic=false);
     LatticeFermion      operator()(const LatticeFermion     &F, bool antiperiodic=true );
     LatticePropagator   operator()(const LatticePropagator  &S, bool antiperiodic=true );
 private:

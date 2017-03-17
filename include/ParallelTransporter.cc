@@ -57,6 +57,17 @@ ParallelTransporter::ParallelTransporter(const multi1d<LatticeColorMatrix> &U, c
     shifter.make(jump(displacement));
 };
 
+ParallelTransporter::ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const std::string P)
+{
+    Path temp(P);
+    WilsonLine W(P);
+    WL=W(U);
+    displacement.resize(Nd);
+    for_direction(d) { displacement[d] = temp.total_displacement()[d]; }
+    shifter.make(jump(displacement));
+};
+
+
 LatticeReal         ParallelTransporter::operator()(const LatticeReal           &R, bool antiperiodic){
     LatticeReal result = antiperiodic ? enforce_boundary_conditions(shifter(R)) : shifter(R);
     return result;
@@ -72,6 +83,13 @@ LatticeColorVector  ParallelTransporter::operator()(const LatticeColorVector    
     LatticeColorVector result = antiperiodic ? enforce_boundary_conditions(temp) : temp;
     return result;
 }
+
+LatticeColorMatrix  ParallelTransporter::operator()(const LatticeColorMatrix    &M, bool antiperiodic){
+    LatticeColorMatrix temp = WL*shifter(M);
+    LatticeColorMatrix result = antiperiodic ? enforce_boundary_conditions(temp) : temp;
+    return result;
+}
+
 
 LatticeFermion      ParallelTransporter::operator()(const LatticeFermion        &F, bool antiperiodic){
     LatticeFermion temp = WL*shifter(F);
