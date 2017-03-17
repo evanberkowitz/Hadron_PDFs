@@ -107,6 +107,7 @@ OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o 
 tests :
 	make test/macro/{lattice,timed}.x 
 	make test/utility/{sign,version}.x 
+	make test/include/ParallelTransporter.x
 	
 .PHONY: all
 all:
