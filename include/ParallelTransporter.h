@@ -26,6 +26,7 @@ public:
     LatticeColorMatrix  operator()(const LatticeColorMatrix &M, bool antiperiodic=false);
     LatticeFermion      operator()(const LatticeFermion     &F, bool antiperiodic=true );
     LatticePropagator   operator()(const LatticePropagator  &S, bool antiperiodic=true );
+    multi1d<int> total_displacement(){ return displacement; };
 private:
     template<class T> OLattice<T> enforce_boundary_conditions(const OLattice<T>& field);
     LatticeColorMatrix WL;
