@@ -19,7 +19,8 @@ public:
         // Note that this is the opposite of what we want---we have specified where the data we have should go.
         // Therefore, just as in WilsonLine.cc we need the opposite sign.  This way data at 0 will go to displacement,
         // rather than vice-versa.
-        temp[d]=x[d] - sign*displacement[d] + Layout::lattSize()[d];
+        temp[d]=x[d] - sign*displacement[d];
+        while( temp[d] <= 0 ){ temp[d] += Layout::lattSize()[d] ;}
         temp[d]=temp[d] % Layout::lattSize()[d];
         }
         return temp;
