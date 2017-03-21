@@ -4,46 +4,6 @@
 #include "include/Plaquette.h"
 #include "include/ParallelTransporter.h"
 
-/*  Two alleged ways of computing the plaquette.
- *  MP_O: ripped out of MesPlq (same expression is in the gauge action).
- *  MP_E: Evan's intuition of what U should represent.
- */
-
-  Double MP_O(const multi1d<LatticeColorMatrix>& u)
-  {
-    START_CODE();
-  Double result=0.0;
-    for(int mu=1; mu < Nd; ++mu){
-        for(int nu=0; nu < mu; ++nu){
-            result += sum(real(trace(u[mu]*shift(u[nu],FORWARD,mu)*adj(shift(u[mu],FORWARD,nu))*adj(u[nu]))));
-          }
-    }
-
-    result *= 2.0 / (Nc * Double(Layout::vol()));
-
-    END_CODE();
-    return result;
-  }
-
-
-  Double MP_E(const multi1d<LatticeColorMatrix>& u)
-  {
-    START_CODE();
-  Double result=0.0;
-    for(int mu=1; mu < Nd; ++mu){
-        for(int nu=0; nu < mu; ++nu){
-            result += sum(real(trace( adj(u[nu]) * adj(shift( u[mu], FORWARD, nu)) * shift(u[nu], FORWARD, mu) * u[mu] )));
-          }
-    }
-
-    result *= 2.0 / (Nc * Double(Layout::vol()));
-
-    END_CODE();
-    return result;
-  }
-
-
-
 
 int main(int argc, char **argv){
     
@@ -63,36 +23,6 @@ int main(int argc, char **argv){
 
     bool pass=true;
     double tol= 8 * DBL_EPSILON;
-
-    //
-    // /*   Begin Evan's plaquette test:
-    // *
-    // */
-    //
-    // QDPIO::cout << banner("Plaquette Comparison") << std::endl;
-    //
-    // multi1d<LatticeColorMatrix> plq_test(Nd);
-    //
-    // for( int test = 0; test < 10; test++){
-    // Chroma::HotSt(plq_test);
-    //
-    // Double balint=0.0, evan=0.0;
-    // balint = MP_O(plq_test);
-    // evan   = MP_E(plq_test);
-    //
-    // QDPIO::cout << "Balint says  " << balint << std::endl;
-    // QDPIO::cout << "Evan   says  " << evan   << std::endl;
-    // QDPIO::cout << "The ratio is " << (balint/evan) << std::endl;
-    // QDPIO::cout << "--------------------------" << std::endl;
-    // }
-    // Chroma::finalize();
-    // return 0;
-    // /*
-    // *   End Evan's plaquette test.
-    // */
-    //
-
-
 
     QDPIO::cout << banner("Parallel Transporter") << std::endl;
     
@@ -143,8 +73,9 @@ int main(int argc, char **argv){
         ParallelTransporter push(links, ds+":1");
         LatticeColorMatrix pushed=push(ONE);
         // QDPIO::cout << "Now, we should be able to compare the gauge link in the " << d << " direction with the pushed matrix." << std::endl;
-        // QDPIO::cout << "First, a global consistency check.  The inner product of U["+ds+"](x) and the pushed field(x+\\hat{"+ds+"}) should be Nc at each site." << std::endl;
-        Double ip=real(innerProduct(links[d], shift(pushed,FORWARD,d)));
+        // QDPIO::cout << "First, a global consistency check.  The inner product of adj(U["+ds+"](x)) and the pushed field(x+\\hat{"+ds+"}) should be Nc at each site." << std::endl;
+        // QDPIO::cout << "Recall that it's adj(U), because Chroma adopts the 'other' convention, as discussed in include/WilsonLine.cc" << std::endl;
+        Double ip=real(innerProduct(adj(links[d]), shift(pushed,FORWARD,d)));
         double ip_norm=toDouble(ip)/double(Nc*Layout::vol()) ;
         // QDPIO::cout << "Normalizing by volume and Nc, one finds " << ip_norm << std::endl;
         if( abs(ip_norm - 1.0) > tol) {
@@ -164,7 +95,7 @@ int main(int argc, char **argv){
         int pass_count=Layout::vol();
         for( eps=1.0; pass_count == Layout::vol(); eps/=2){
             QDPIO::cout << "." << std::flush;
-            IP=real(localInnerProduct(links[d], shift(pushed, FORWARD, d)));
+            IP=real(localInnerProduct(adj(links[d]), shift(pushed, FORWARD, d)));
             PASS=where( fabs(IP-Nc) > eps, 0, 1 );
             pass_count=toInt(sum(PASS));
         }
@@ -172,13 +103,11 @@ int main(int argc, char **argv){
         if( eps > tol ){
             QDPIO::cout << "FAIL!  This is too different---tolerance is " << tol << std::endl;
             QDP_abort(EXIT_FAILURE);
-        } else {
-            QDPIO::cout << "PASS!  Tolerance is " << tol << std::endl;
-            QDPIO::cout << "Even with this fine a difference, the number of passing sites is " << pass_count << " while there are " << Layout::vol() << " sites while at " << (2*tol) << " every site passed" << std::endl;
-        }
-        
+        } 
     }
     
+
+    QDPIO::cout << "PASS!  Tolerance is " << tol << std::endl;
     QDPIO::cout << "This demonstrates that one-site hops work." << std::endl;
     
     

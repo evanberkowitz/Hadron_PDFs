@@ -88,7 +88,7 @@ LatticeColorVector  ParallelTransporter::operator()(const LatticeColorVector    
 }
 
 LatticeColorMatrix  ParallelTransporter::operator()(const LatticeColorMatrix    &M, bool antiperiodic){
-    LatticeColorMatrix temp = shifter(M)*WL;
+    LatticeColorMatrix temp = WL*shifter(M);
     LatticeColorMatrix result = antiperiodic ? enforce_boundary_conditions(temp) : temp;
     return result;
 }
