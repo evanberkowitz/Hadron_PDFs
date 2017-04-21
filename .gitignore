@@ -8,6 +8,12 @@
 *.gch
 *.pch
 
+# SWIG and Python
+*_wrap.cc
+*.pyc
+*.py
+
+
 # Compiled Dynamic libraries
 *.so
 *.dylib

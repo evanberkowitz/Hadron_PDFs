@@ -1,4 +1,7 @@
 #include "standard_includes.h"
+#include "include/SpinBasis.h"
+#include "include/Action.h"
+#include "include/Solver.h"
 
 int main(int argc, char **argv){
 
