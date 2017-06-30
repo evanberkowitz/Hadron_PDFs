@@ -25,8 +25,7 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     // r = shift(a, sign, dir)
     //
     // then r(x) = a(x + sign * \hat{dir} ).
-    // Therefore, if we want result(x+µ) = U^µ(x) * v(x), we need a negative QDP++ shift,
-    // result(x) = U^µ(x-µ) * v(x-µ)
+    // Therefore, if we want result(x+µ) = input(x), we need a negative QDP++ shift,
     // This is exactly the opposite of what *I* mean by a shift.
 
     // Consider this code from Chroma::MesPlq for computing the plaquette:
@@ -35,8 +34,8 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     //
     // Here is a picture of the Chroma convention.
     //
-    //        x + nu <----- U[mu](x+nu) --- x + nu + mu
-    //          |                               |
+    //        x + nu ----- U[mu](x+nu) ---> x + nu + mu
+    //          ^                               ^
     //          |                               |
     //          |                               |
     //          |                               |
@@ -44,17 +43,15 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     //          |                               |
     //          |                               |
     //          |                               |
-    //          v                               v
-    //          x    <------ U[mu](x) ------- x + mu
+    //          |                               |
+    //          x    ------ U[mu](x) -------> x + mu
     //
-    // One can see that this plaquette goes up the left side, across the top, down the right, and across the bottom
-    // of my little figure.
+    // One can see, reading the code from left to right, that the plaquette goes counter clockwise.
+    // This means that the left color index of U[mu](x) lives at x and the right color index lives at x+µ.
     //
-    // This is opposite convention of:  PSI(x+mu) = U[mu](x) * PSI(x).
-    //
-    // So, if you have something at x and you want to move it to x+mu, you need to multiply it by adj(U[mu]) and then shift.
-    // If you have something at x and you want to move it to x-mu, you shift it first and then multiply by U[mu].
-    return sign > 0 ? shift( adj(U[dir]) * v, -1, dir) : U[dir] * shift(v, +1, dir);
+    // So, if you have a color vector at x and you want to move it to x+mu, you need to multiply it by transpose(U[mu]) and then shift.
+    // If you have something at x and you want to move it to x-mu, you shift it first and then multiply by conjugate(U[mu]).
+    return sign > 0 ? shift( transpose(U[dir]) * v, -1, dir) : conj(U[dir]) * shift(v, +1, dir);
 }
 
 LatticeColorMatrix WilsonLine::operator()(const multi1d<LatticeColorMatrix> &U){

@@ -72,10 +72,7 @@ int main(int argc, char **argv){
         std::string ds=int_to_string(d);
         ParallelTransporter push(links, ds+":1");
         LatticeColorMatrix pushed=push(ONE);
-        // QDPIO::cout << "Now, we should be able to compare the gauge link in the " << d << " direction with the pushed matrix." << std::endl;
-        // QDPIO::cout << "First, a global consistency check.  The inner product of adj(U["+ds+"](x)) and the pushed field(x+\\hat{"+ds+"}) should be Nc at each site." << std::endl;
-        // QDPIO::cout << "Recall that it's adj(U), because Chroma adopts the 'other' convention, as discussed in include/WilsonLine.cc" << std::endl;
-        Double ip=real(innerProduct(adj(links[d]), shift(pushed,FORWARD,d)));
+        Double ip=real(innerProduct(transpose(links[d]), shift(pushed,FORWARD,d)));
         double ip_norm=toDouble(ip)/double(Nc*Layout::vol()) ;
         // QDPIO::cout << "Normalizing by volume and Nc, one finds " << ip_norm << std::endl;
         if( abs(ip_norm - 1.0) > tol) {
@@ -95,7 +92,7 @@ int main(int argc, char **argv){
         int pass_count=Layout::vol();
         for( eps=1.0; pass_count == Layout::vol(); eps/=2){
             QDPIO::cout << "." << std::flush;
-            IP=real(localInnerProduct(adj(links[d]), shift(pushed, FORWARD, d)));
+            IP=real(localInnerProduct(transpose(links[d]), shift(pushed, FORWARD, d)));
             PASS=where( fabs(IP-Nc) > eps, 0, 1 );
             pass_count=toInt(sum(PASS));
         }
