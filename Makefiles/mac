@@ -16,8 +16,11 @@ DIR_USQCD:=/Users/evanberkowitz/USQCD/install
 DIR_QMP:=$(DIR_USQCD)/qmp
 DIR_QDP:=$(DIR_USQCD)/qdpxx
 DIR_CHROMA:=$(DIR_USQCD)/chroma
-DIR_XML2:=$(DIR_USQCD)/libxml2
+DIR_XML2:=/usr/local/opt/libxml2
 DIR_FFTW:=/usr/local
+
+PYTHON_CONFIG:=/usr/local/Cellar/python/2.7.13/bin/python-config
+SWIG:=$(shell which swig)
 
 DIR_INSTALL:=.
 
@@ -60,13 +63,13 @@ LIB_BLAS:=-lblas
 ###### INCLUDES
 ######
 
-INCLUDES:=-I. $(shell $(DIR_CHROMA)/bin/chroma-config --cxxflags) $(INCLUDES_FFT) -I$(DIR_CHROMA)/include -I$(DIR_QDP)/include -I$(DIR_QDP)/other_libs/qio/include -I$(DIR_QDP)/other_libs/clime/include -I$(DIR_QDP)/other_libs/xpath_reader/include -I$(DIR_XML2)/include -I$(DIR_QMP)/include
+INCLUDES:=-I. $(shell $(DIR_CHROMA)/bin/chroma-config --cxxflags) $(INCLUDES_FFT) -I$(DIR_CHROMA)/include -I$(DIR_QDP)/include -I$(DIR_QDP)/other_libs/qio/include -I$(DIR_QDP)/other_libs/clime/include -I$(DIR_QDP)/other_libs/xpath_reader/include -I$(DIR_XML2)/include -I$(DIR_QMP)/include $(shell $(PYTHON_CONFIG) --includes)
 
 ######
 ###### LIBRARIES
 ######
 
-LIBS:=$(shell $(DIR_CHROMA)/bin/chroma-config --ldflags) $(shell $(DIR_CHROMA)/bin/chroma-config --libs) -ldl $(LIB_FFT)
+LIBS:=$(shell $(DIR_CHROMA)/bin/chroma-config --ldflags) $(shell $(DIR_CHROMA)/bin/chroma-config --libs) -ldl $(LIB_FFT) $(shell $(PYTHON_CONFIG) --libs)
 
 ######
 ###### DEFINES
@@ -80,7 +83,7 @@ DEFS:=-DDEBUG -DBLAS_TRAILING_UNDERSCORE $(DEF_GIT) -D_GLIBC_USE_CXX1_ABI=0
 
 FLAGS_C =   $(FLAG_OMP) -std=gnu99 -march=native -ffunction-sections -fdata-sections $(DEFS) $(OPT) $(INCLUDES)
 FLAGS_CXX = $(FLAG_OMP) -ffunction-sections -fdata-sections $(DEBUG) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
-FLAGS_LD =  $(FLAG_OMP) #-Wl,--gc-sections
+FLAGS_LD =  $(FLAG_OMP) $(shell $(PYTHON_CONFIG) --ldflags)#-Wl,--gc-sections
 
 ifeq ($(MKL),1)
 FLAGS_C+=-mkl
@@ -91,18 +94,27 @@ endif
 ###### OBJECTS
 ######
 
-OBJECTS:=utility/version.o utility/banner.o include/Path.o include/WilsonLine.o include/ParallelTransporter.o
+UTILITIES:=utility/version.o utility/banner.o
+OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o include/SpinBasis.o include/Action.o include/Solver.o
 
 ######
 ###### TARGETS
 ######
 
 .PRECIOUS: %.o
+
+_%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) -shared $*_wrap.o -o $@ $(LIBS)
+
+%_wrap.o:
+	$(SWIG) -python -c++ -o $*_wrap.cc $*.i
+	$(CXX) $(FLAGS_CXX) $(DEFS) -c $*_wrap.cc -o $@
+
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
-%.x : $(OBJECTS) %.o 
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(OBJECTS) $*.o -o $*.x $(LIBS)
+%.x : $(UTILITIES) $(OBJECTS) %.o 
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) $*.o -o $*.x $(LIBS)
 
 tests :
 	make test/macro/{lattice,timed}.x 
@@ -114,7 +126,16 @@ all:
 	make Hadron_PDFs.x
 	make tests
 
+.PHONY: python
+python:
+	make include/_Action.so
+	make include/_Solver.so
+
 .PHONY: clean
 clean:
-	find . -name '*.o' -delete
-	find . -name '*.x' -delete
+	find . -name '*.o'        -delete
+	find . -name '*.so'       -delete
+	find . -name '*.x'        -delete
+	find . -name '*.pyc'      -delete
+	find . -name '*.py'       -delete
+	find . -name '*_wrap.cc'  -delete
