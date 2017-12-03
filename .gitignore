@@ -12,7 +12,7 @@
 *_wrap.cc
 *.pyc
 *.py
-
+*.i
 
 # Compiled Dynamic libraries
 *.so
