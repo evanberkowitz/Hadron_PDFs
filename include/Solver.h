@@ -1,9 +1,6 @@
 #ifndef _HADRON_PDFS_SOLVER_BASE
 #define _HADRON_PDFS_SOLVER_BASE
 
-#include "include/SpinBasis.h"
-#include "include/Action.h"
-
 // A solver is a function
 //
 // lattice source field (fermion, propagator, ...) --> lattice propagator
@@ -14,16 +11,15 @@
 //
 // where D is the dirac operator.
 
+#include "include/Action.h"
+
 class Solver{
 public:
-    Solver( const Action &S, const GroupXML_t solverParams, const multi1d<LatticeColorMatrix> &U, SPIN_BASIS desired_basis=SPIN_BASIS::DIRAC_PAULI);
-    LatticePropagator operator()(const LatticePropagator& source);
+    Solver( const Action &S, GroupXML_t solver_parameters, const multi1d<LatticeColorMatrix> &U );
+    void operator()(LatticePropagator& result, const LatticePropagator& source);
     // TODO: It would be nice to require the ability to spit out XML.
 private:
-    Handle< SystemSolver<LatticeFermion> > solver;
-    SPIN_BASIS default_spin_basis;
-    SPIN_BASIS desired_spin_basis;
-    
+    Handle< SystemSolver<LatticeFermion> > D_inv;
 };
 
 #endif /* end of include guard: _HADRON_PDFS_SOLVER_BASE */

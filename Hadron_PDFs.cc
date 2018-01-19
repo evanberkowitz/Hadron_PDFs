@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     QDPIO::cout << configuration.cfg_file << " read successfully, unitarity check passed." << std::endl;
 
     QDPIO::cout << "Doing a random gauge transformation... " << std::flush;
-    rgauge(U);
+    // rgauge(U);
     QDPIO::cout << "done!" << std::endl;
 
 
@@ -99,10 +99,13 @@ int main(int argc, char **argv){
     GroupXML_t Solver_Parameters = readXMLGroup(read_solver, "HighPrecision", "invType");
     QDPIO::cout << "done!" << std::endl;
     
+    // Action A(XML, "/Hadron_PDFs/FermionAction/light");
+    // Solver SOL(A, Solver_Parameters, U);
+    
     QDPIO::cout << "Constructing state..." << std::flush;
     Handle<FermState< FERMION > > state(S.createState(U));
     QDPIO::cout << "done!" << std::endl;
-    
+
     QuarkSpinType quarkSpinType = QUARK_SPIN_TYPE_FULL;
     int ncg_had = 0;
 
@@ -137,7 +140,6 @@ int main(int argc, char **argv){
     
     timed("Hadron_PDFs"){
     
-        QDPIO::cout << "# We don't have enough infrastructure to build the measurement yet, but I thought I would lay out the pseudocode." << std::endl;
         QDPIO::cout << "# Currently I describe the isospin limit, and consider light quarks only." << std::endl;
     
         QDPIO::cout << "# For the configuration" << std::endl;
@@ -152,6 +154,7 @@ int main(int argc, char **argv){
                 S.quarkProp(all_from_point, xml_out, point_source, state, Solver_Parameters, quarkSpinType, ncg_had);
                 xml_out.flush();
                 pop(xml_out);
+                // SOL(all_from_point, point_source);
                 
                 H5.write("/propagators/all_point", all_from_point, HDF5Base::trunc);
                 
@@ -202,6 +205,7 @@ int main(int argc, char **argv){
                     QDPIO::cout << "#             Apply the outgoing photon vertex to the propagator." << std::endl;
                     QDPIO::cout << "#             Re-solve the Dirac equation using that propagator as the source." << std::endl;
                     
+                    // SOL(all_from_W_all_from_point, W_all_from_point);
                     push(xml_out, "fh_prop_"+path_specifier[p]);
                     S.quarkProp(all_from_W_all_from_point, xml_out, W_all_from_point, state, Solver_Parameters, quarkSpinType, ncg_had);
                     xml_out.flush();

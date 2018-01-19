@@ -5,13 +5,18 @@
 
 class Solver;
 
+typedef Handle<FermState<LatticeFermion, multi1d<LatticeColorMatrix>, multi1d<LatticeColorMatrix> > > State;
+typedef Handle< SystemSolver<LatticeFermion> > System_Solver;
+
 class Action {
 friend class Solver;
 public:
-    Action(const GroupXML_t &ferm, SPIN_BASIS default_spin_basis=SPIN_BASIS::CHROMA);
+    Action(XMLReader& file, const std::string& path);
+    State state(const multi1d<LatticeColorMatrix> &U );
+    System_Solver solver(State &state, GroupXML_t solver_parameters);
 private:
     Handle<const WilsonTypeFermAct<LatticeFermion, multi1d<LatticeColorMatrix>, multi1d<LatticeColorMatrix> > > S;
-    SPIN_BASIS spin_basis;
+    System_Solver sys_solver;
 };
 
 
