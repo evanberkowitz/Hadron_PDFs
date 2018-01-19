@@ -81,8 +81,8 @@ DEFS:=-DDEBUG -DBLAS_TRAILING_UNDERSCORE $(DEF_GIT) -D_GLIBC_USE_CXX1_ABI=0
 ###### FLAGS
 ######
 
-FLAGS_C =   $(FLAG_OMP) -std=gnu99 -march=native -ffunction-sections -fdata-sections $(DEFS) $(OPT) $(INCLUDES)
-FLAGS_CXX = $(FLAG_OMP) -ffunction-sections -fdata-sections $(DEBUG) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
+FLAGS_C =   $(FLAG_OMP) -g -std=gnu99 -march=native -ffunction-sections -fdata-sections $(DEFS) $(OPT) $(INCLUDES)
+FLAGS_CXX = $(FLAG_OMP) -g -ffunction-sections -fdata-sections $(DEBUG) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
 FLAGS_LD =  $(FLAG_OMP) $(shell $(PYTHON_CONFIG) --ldflags)#-Wl,--gc-sections
 
 ifeq ($(MKL),1)
@@ -94,6 +94,8 @@ endif
 ###### OBJECTS
 ######
 
+HEADERS:=standard_includes.h
+IO:=io/xml.o
 UTILITIES:=utility/version.o utility/banner.o
 OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o include/SpinBasis.o include/Action.o include/Solver.o
 
@@ -113,13 +115,13 @@ _%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
-%.x : $(UTILITIES) $(OBJECTS) %.o 
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) $*.o -o $*.x $(LIBS)
+%.x : $(HEADERS) $(IO) $(UTILITIES) $(OBJECTS) %.o 
+	$(CXX) $(DEFINES) $(FLAGS_LD) $(IO) $(UTILITIES) $(OBJECTS) $*.o -o $*.x $(LIBS)
 
 tests :
 	make test/macro/{lattice,timed}.x 
 	make test/utility/{sign,version}.x 
-	make test/include/ParallelTransporter.x
+	make test/include/{ParallelTransporter,Path}.x
 	
 .PHONY: all
 all:
