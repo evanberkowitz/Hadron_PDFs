@@ -53,6 +53,13 @@ template<class T> OLattice<T> ParallelTransporter::enforce_boundary_conditions(c
     return result;
 }
 
+ParallelTransporter::ParallelTransporter(){
+    WL = 1;
+    displacement.resize(Nd);
+    for_direction(d) displacement[d] = 0;
+    shifter.make(jump(displacement));
+}
+
 ParallelTransporter::ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const Path &P) : 
     WL(WilsonLine(P)(U)),
     displacement(P.total_displacement())
@@ -69,6 +76,20 @@ ParallelTransporter::ParallelTransporter(const multi1d<LatticeColorMatrix> &U, c
     for_direction(d) { displacement[d] = temp.total_displacement()[d]; }
     shifter.make(jump(displacement));
 };
+
+ParallelTransporter::ParallelTransporter(const LatticeColorMatrix &product_of_links, const multi1d<int> &disp){
+    WL = product_of_links;
+    displacement.resize(Nd);
+    for_direction(d) displacement[d] = disp[d];
+    shifter.make(jump(displacement));
+}
+
+ParallelTransporter::ParallelTransporter(const ParallelTransporter &p){
+    WL = p.WL;
+    displacement.resize(Nd);
+    for_direction(d) displacement[d] = p.displacement[d];
+    shifter.make(jump(displacement));
+}
 
 
 LatticeReal         ParallelTransporter::operator()(const LatticeReal           &R, bool antiperiodic){
@@ -104,4 +125,11 @@ LatticePropagator   ParallelTransporter::operator()(const LatticePropagator     
     LatticePropagator temp = WL*shifter(S);
     LatticePropagator result = antiperiodic ? enforce_boundary_conditions(temp) : temp;
     return result;
+}
+
+ParallelTransporter ParallelTransporter::reverse(){
+    multi1d<int> backward(Nd);
+    for_direction(d)    backward[d] = -displacement[d];
+    ParallelTransporter rev( adj(WL), backward );
+    return rev;
 }

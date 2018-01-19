@@ -18,8 +18,11 @@
 
 class ParallelTransporter {
 public:
+    ParallelTransporter();
     ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const Path &P);
     ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const std::string P);
+    ParallelTransporter(const LatticeColorMatrix &product_of_links, const multi1d<int> &displacement);
+    ParallelTransporter(const ParallelTransporter &p);
     LatticeReal         operator()(const LatticeReal        &R, bool antiperiodic=false);
     LatticeComplex      operator()(const LatticeComplex     &C, bool antiperiodic=false);
     LatticeColorVector  operator()(const LatticeColorVector &V, bool antiperiodic=false);
@@ -27,6 +30,9 @@ public:
     LatticeFermion      operator()(const LatticeFermion     &F, bool antiperiodic=true );
     LatticePropagator   operator()(const LatticePropagator  &S, bool antiperiodic=true );
     multi1d<int> total_displacement(){ return displacement; };
+
+    ParallelTransporter reverse();
+
 private:
     template<class T> OLattice<T> enforce_boundary_conditions(const OLattice<T>& field);
     LatticeColorMatrix WL;
