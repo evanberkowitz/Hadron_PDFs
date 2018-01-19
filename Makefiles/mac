@@ -28,7 +28,7 @@ DIR_INSTALL:=.
 ###### Capture GIT information:
 ######
 
-DEF_GIT=-DGIT_BRANCH="\"$(shell git rev-parse --abbrev-ref HEAD)\"" -DGIT_LATEST_COMMIT="\"$(shell git log -n 1 --pretty='%H')\"" -DGIT_COMMIT_TIME="\"$(shell git log --pretty='%ci' -n 1)\"" -DGIT_PORCELAIN="\"$(shell git status --porcelain 2>/dev/null| wc -l | tr -d [:blank:])\""
+GIT_STATUS=version.h
 
 ######
 ###### OpenMP
@@ -105,6 +105,8 @@ OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o inclu
 
 .PRECIOUS: %.o
 
+default: Hadron_PDFs.x
+
 _%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) -shared $*_wrap.o -o $@ $(LIBS)
 
@@ -115,8 +117,13 @@ _%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
-%.x : $(HEADERS) $(IO) $(UTILITIES) $(OBJECTS) %.o 
+%.x : $(HEADERS) $(IO) $(UTILITIES) $(OBJECTS) %.o
+	make $(GIT_STATUS)
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(IO) $(UTILITIES) $(OBJECTS) $*.o -o $*.x $(LIBS)
+
+.PHONY: $(GIT_STATUS)
+$(GIT_STATUS):
+	./$*.sh > $(GIT_STATUS)
 
 tests :
 	make test/macro/{lattice,timed}.x 
@@ -141,3 +148,4 @@ clean:
 	find . -name '*.pyc'      -delete
 	find . -name '*.py'       -delete
 	find . -name '*_wrap.cc'  -delete
+	$(RM) $(GIT_STATUS)

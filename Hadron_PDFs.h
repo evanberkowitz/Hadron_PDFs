@@ -1,6 +1,7 @@
 #ifndef _HADRON_PDFS_H
 #define _HADRON_PDFS_H
 
+#include "version.h"
 #include "standard_includes.h"
 #include "infrastructure/version.h"
 #include "io/parameters/lattice.h"

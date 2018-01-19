@@ -29,7 +29,6 @@
 #include "utility/vector_to_string.h"
 #include "utility/sign.h"
 #include "utility/file_exists.h"
-#include "infrastructure/version.h"
 
 #include "io/xml.h"
 #include "io/trim_string.h"
