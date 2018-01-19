@@ -232,6 +232,22 @@ Path::Path(const std::string  &P){
     END_CODE();
 }
 
+Path Path::reverse(){
+    int R = dx.nrows();
+    int C = dx.ncols();
+    multi2d<int> reversed(R, C);
+    for(unsigned int row=0; row < R; row++){
+        for(unsigned int col=0; col < C; col++){
+            reversed[row][col] = -dx[R-row-1][col];
+            // QDPIO::cout << reversed[row][col] << " " << std::flush;
+        }
+        // QDPIO::cout << std::endl;
+    }
+    
+    Path r( reversed );
+    return r;
+}
+
 std::string Path::short_string(){
     return multi2d_int_to_string(compressed);
 }
