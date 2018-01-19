@@ -157,6 +157,16 @@ int main(int argc, char **argv){
     
     
     
+    QDPIO::cout << banner("Path reversal") << std::endl;
+    std::string reversal_target="2:1;1:-2;0:-3;";
+    Path R = P[3].reverse();
+    QDPIO::cout << "P[3] is built from the string '" << test_path_3      << "'" << std::endl;
+    QDPIO::cout << "The reverse() amounts to      '" << R.short_string() << "'" << std::endl;
+    pass = ( R.short_string() == reversal_target);
+    QDPIO::cout << ( pass ? "PASS!" : "FAIL!" ) << "                         '"<< reversal_target <<"'" << std::endl;
+    if ( ! pass ) { QDP_abort(EXIT_FAILURE); }
+    
+    
     QDPIO::cout << banner("PASS!") << std::endl;
     
     Chroma::finalize();
