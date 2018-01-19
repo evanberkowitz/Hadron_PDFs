@@ -3,7 +3,6 @@
 
 #include "version.h"
 #include "standard_includes.h"
-#include "infrastructure/version.h"
 #include "io/parameters/lattice.h"
 #include "include/PointSource.h"
 

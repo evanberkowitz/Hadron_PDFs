@@ -96,7 +96,7 @@ endif
 
 HEADERS:=standard_includes.h
 IO:=io/xml.o
-UTILITIES:=utility/version.o utility/banner.o
+UTILITIES:=utility/banner.o
 OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o include/SpinBasis.o include/Action.o include/Solver.o
 
 ######
@@ -105,7 +105,10 @@ OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o inclu
 
 .PRECIOUS: %.o
 
-default: Hadron_PDFs.x
+.PHONY: all
+all:
+	make Hadron_PDFs.x
+	make tests
 
 _%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) -shared $*_wrap.o -o $@ $(LIBS)
@@ -117,24 +120,19 @@ _%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
-%.x : $(HEADERS) $(IO) $(UTILITIES) $(OBJECTS) %.o
+%.x : $(HEADERS) $(IO) $(UTILITIES) $(OBJECTS) $(GIT_STATUS) %.o
 	make $(GIT_STATUS)
 	$(CXX) $(DEFINES) $(FLAGS_LD) $(IO) $(UTILITIES) $(OBJECTS) $*.o -o $*.x $(LIBS)
 
 .PHONY: $(GIT_STATUS)
 $(GIT_STATUS):
-	./$*.sh > $(GIT_STATUS)
+	./version.sh > $(GIT_STATUS)
 
 tests :
 	make test/macro/{lattice,timed}.x 
 	make test/utility/{sign,version}.x 
 	make test/include/{ParallelTransporter,Path}.x
 	
-.PHONY: all
-all:
-	make Hadron_PDFs.x
-	make tests
-
 .PHONY: python
 python:
 	make include/_Action.so
