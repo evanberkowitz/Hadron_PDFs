@@ -194,8 +194,8 @@ int main(int argc, char **argv){
         FWD_BWD[2][0]=new ParallelTransporter(links, "0:-1;2:1;3:-1;1:1");           FWD_BWD[2][1]=new ParallelTransporter(links, "1:-1;3:+1;2:-1;0:+1");
         FWD_BWD[3][0]=new ParallelTransporter(links, "3:24");                        FWD_BWD[3][1]=new ParallelTransporter(links, "3:-24");
         FWD_BWD[4][0]=new ParallelTransporter(links, "0:4;1:7;3:1;3:-1;2:4");        FWD_BWD[4][1]=new ParallelTransporter(links, "2:-4;1:-7;0:-4");
-        // FWD_BWD[4][0]=new ParallelTransporter(links, "1:1;3:1;");     FWD_BWD[4][1]=new ParallelTransporter(links, "3:-1;1:-1;");
-        // FWD_BWD[5][0]=new ParallelTransporter(links, "2:1;3:1;");     FWD_BWD[5][1]=new ParallelTransporter(links, "3:-1;2:-1;");
+        FWD_BWD[4][0]=new ParallelTransporter(links, "1:1;3:1;");     FWD_BWD[4][1]=new ParallelTransporter(links, "3:-1;1:-1;");
+        FWD_BWD[5][0]=new ParallelTransporter(links, "2:1;3:1;");     FWD_BWD[5][1]=new ParallelTransporter(links, "3:-1;2:-1;");
         
         LatticeInt  PASS=1;
         int pass_count=0;
@@ -211,7 +211,7 @@ int main(int argc, char **argv){
 
             double eps=1.0;
             // Now, if the two really undo one another, if I subtract and normalize to (Nc*r) --- Nc because I trace.
-            PASS=where( fabs(real(traceColor(bwd - start))/(Nc*r)) < 100, 1, 0);
+            PASS=where( fabs(real(traceColor(bwd - start))/(Nc*r)) < eps, 1, 0);
             pass_count=toInt(sum(PASS));
             
             QDPIO::cout << "On cfg " << fwd_bwd_test_count << " path " << path << " shows agreement to" << std::flush;
@@ -237,6 +237,49 @@ int main(int argc, char **argv){
     }
     QDPIO::cout << "PASS!  Everything returned to its original value within tolerance of " << tol << std::endl;
     
+    
+    // QDPIO::cout << banner("Path reversal test:  ParallelTransporter.reverse() transports things back.");
+    // timed("Parallel Transport Reversal Test")  for( int fwd_bwd_test_count = 0; fwd_bwd_test_count < 10; fwd_bwd_test_count++ )
+    // {
+    //     LatticeInt  PASS=1;
+    //     int pass_count=0;
+    //
+    //     FWD_BWD[0][0]=new ParallelTransporter(links, "0:1;1:1;");                    // FWD_BWD[0][1]=new ParallelTransporter(links, "1:-1;0:-1;");
+    //     FWD_BWD[1][0]=new ParallelTransporter(links, "0:1;2:1;3:1;1:1");             // FWD_BWD[1][1]=new ParallelTransporter(links, "1:-1;3:-1;2:-1;0:-1");
+    //     FWD_BWD[2][0]=new ParallelTransporter(links, "0:-1;2:1;3:-1;1:1");           // FWD_BWD[2][1]=new ParallelTransporter(links, "1:-1;3:+1;2:-1;0:+1");
+    //     FWD_BWD[3][0]=new ParallelTransporter(links, "3:24");                        // FWD_BWD[3][1]=new ParallelTransporter(links, "3:-24");
+    //     FWD_BWD[4][0]=new ParallelTransporter(links, "0:4;1:7;3:1;3:-1;2:4");        // FWD_BWD[4][1]=new ParallelTransporter(links, "2:-4;1:-7;0:-4");
+    //
+    //     for(int path=0; path<FWD_BWD.nrows(); path++){
+    //         LatticeReal r=zero;
+    //         LatticeColorMatrix start=zero;
+    //         gaussian(r); start=r;
+    //         ParallelTransporter return_path = FWD_BWD[path][0]->reverse();
+    //
+    //         fwd = FWD_BWD[path][0]->operator()(start);
+    //         bwd = return_path(fwd);
+    //
+    //         double eps=1.0;
+    //         PASS=where( fabs(real(traceColor(bwd - start))/(Nc*r)) < eps, 1, 0);
+    //         pass_count=toInt(sum(PASS));
+    //
+    //         QDPIO::cout << "On cfg " << fwd_bwd_test_count << " path reversal yields agreement to " << std::flush;
+    //         for( eps = 1.0;  pass_count == Layout::vol(); eps/=2 ){ //pass_count == Layout::vol() &&
+    //             // QDPIO::cout << " eps: " << eps << " pass: " << pass_count << std::flush;
+    //             QDPIO::cout << "." << std::flush;
+    //             PASS=where( fabs(real(traceColor(bwd - start))/(Nc*r)) < eps, 1, 0);
+    //             pass_count=toInt(sum(PASS));
+    //         }
+    //         QDPIO::cout << eps << std::endl;
+    //         if( eps > tol){
+    //             QDPIO::cout << "\nFAIL!  Tolerance is " << tol << std::endl;
+    //             QDP_abort(EXIT_FAILURE);
+    //         }
+    //
+    //     }
+    //
+    //
+    // }
     
     QDPIO::cout << banner("PASS!") << std::endl;
     
