@@ -147,7 +147,7 @@ int main(int argc, char **argv){
     H5.mkdir("/pions");
     H5.mkdir("/transporters");
 
-    QDPIO::cout << "Main Loop:" << std::endl;
+    QDPIO::cout << banner("Main Loop:") << std::endl;
 
     XML.close();
     read_solver.close();
@@ -165,7 +165,7 @@ int main(int argc, char **argv){
                 XMLFileWriter xml_out("propagators.out.xml"); //TODO: make source-dependent?
                 push(xml_out, "propagators");
                 push(xml_out, "all_from_point");
-                S.quarkProp(all_from_point, xml_out, point_source, state, Solver_Parameters, quarkSpinType, ncg_had);
+                timed("initial solve") S.quarkProp(all_from_point, xml_out, point_source, state, Solver_Parameters, quarkSpinType, ncg_had);
                 xml_out.flush();
                 pop(xml_out);
                 // SOL(all_from_point, point_source);
@@ -225,7 +225,7 @@ int main(int argc, char **argv){
                     
                     // SOL(all_from_W_all_from_point, W_all_from_point);
                     push(xml_out, "fh_prop_"+path_specifier[p]);
-                    S.quarkProp(all_from_W_all_from_point, xml_out, W_all_from_point, state, Solver_Parameters, quarkSpinType, ncg_had);
+                    timed("continued solve "+path_specifier[p]) S.quarkProp(all_from_W_all_from_point, xml_out, W_all_from_point, state, Solver_Parameters, quarkSpinType, ncg_had);
                     xml_out.flush();
                     pop(xml_out);
                     
