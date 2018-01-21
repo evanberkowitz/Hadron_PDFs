@@ -30,6 +30,7 @@ public:
     LatticeFermion      operator()(const LatticeFermion     &F, bool antiperiodic=true );
     LatticePropagator   operator()(const LatticePropagator  &S, bool antiperiodic=true );
     multi1d<int> total_displacement(){ return displacement; };
+    void write(HDF5Writer &H5, std::string path);
 
     ParallelTransporter reverse();
 

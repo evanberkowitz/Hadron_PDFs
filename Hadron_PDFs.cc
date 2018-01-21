@@ -42,6 +42,15 @@ int main(int argc, char **argv){
     multi1d<LatticeColorMatrix> U(Nd);
     Cfg_t configuration;
     read(XML, "/Hadron_PDFs/configuration", configuration);
+    bool randomize_configuration=false;
+    try {
+        read(XML, "/Hadron_PDFs/configuration/randomize", randomize_configuration);
+    } catch( const std::string &error ) {
+        QDPIO::cout << "Picking the default for random gauge transformations: false" << std::endl;
+        randomize_configuration = false;
+    }
+    
+
     QDPIO::cout << "Configuration:" << configuration.cfg_file << std::endl;
     QDPIO::cout << "    reading..." << std::endl;
     XMLReader gauge_file_xml, gauge_xml;
@@ -50,9 +59,13 @@ int main(int argc, char **argv){
     
     QDPIO::cout << configuration.cfg_file << " read successfully, unitarity check passed." << std::endl;
 
-    QDPIO::cout << "Doing a random gauge transformation... " << std::flush;
-    // rgauge(U);
-    QDPIO::cout << "done!" << std::endl;
+    if(randomize_configuration){
+        QDPIO::cout << "Doing a random gauge transformation... " << std::flush;
+        rgauge(U);
+        QDPIO::cout << "done!" << std::endl;
+    } else {
+        QDPIO::cout << "Not applying any random gauge transformation. " << std::endl;
+    }
 
 
 
@@ -132,6 +145,7 @@ int main(int argc, char **argv){
     H5.set_stripesize(STRIPE);
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
+    H5.mkdir("/transporters");
 
     QDPIO::cout << "Main Loop:" << std::endl;
 
@@ -186,6 +200,10 @@ int main(int argc, char **argv){
                     QDPIO::cout << "Path has total displacement" << std::flush;
                     for(unsigned int d=0; d<displacement.size(); d++) QDPIO::cout << " " << displacement[d] << std::flush;
                     QDPIO::cout << std::endl;
+                    QDPIO::cout << "Writing transporter..." << std::flush;
+                    H5.mkdir("/transporters/wilson("+path_specifier[p]+")");
+                    transport.write(H5, "/transporters/wilson("+path_specifier[p]+")");
+                    QDPIO::cout << "done!" << std::endl;
                     
                     QDPIO::cout << "Creating second photon..." << std::flush;
                     // LatticeComplex second_photon = phases(photons[q].outgoing);

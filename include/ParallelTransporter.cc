@@ -127,6 +127,11 @@ LatticePropagator   ParallelTransporter::operator()(const LatticePropagator     
     return result;
 }
 
+void ParallelTransporter::write(HDF5Writer &H5, std::string path){
+    H5.write(path+"/displacement", displacement, HDF5Base::trunc);
+    H5.write(path+"/WL",           WL,           HDF5Base::trunc);
+}
+
 ParallelTransporter ParallelTransporter::reverse(){
     multi1d<int> backward(Nd);
     for_direction(d)    backward[d] = -displacement[d];
