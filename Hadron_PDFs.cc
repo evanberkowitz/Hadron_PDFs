@@ -137,11 +137,33 @@ int main(int argc, char **argv){
 
     QDPIO::cout << banner("Prepare output file...") << std::endl;
     
+    std::string output_directory="";
     std::string output_file="";
+    read(XML, "/Hadron_PDFs/output/directory", output_directory);
     read(XML, "/Hadron_PDFs/output/file", output_file);
-    QDPIO::cout << "Output file is " << output_file << std::endl;
+    bool overwrite=false;
+    try {
+        read(XML, "/Hadron_PDFs/output/overwrite", overwrite);
+    } catch( const std::string &error ) {
+        QDPIO::cout << "By default, not overwriting." << std::endl;
+        overwrite = false;
+    }
+    
+    QDPIO::cout << "Output directory is " << output_directory << std::endl;
+    QDPIO::cout << "Output file is      " << output_file << std::endl;
+    if( file_exists(output_directory+"/"+output_file) && ! overwrite){
+        QDPIO::cout << "File exists and overwrite isn't true." << std::endl;
+        QDPIO::cout << "Exiting for safety" << std::endl;
+        QDP_abort(-1);
+    }
+    HDF5Base::writemode io_mode=HDF5Base::ate;
+    if( overwrite && file_exists(output_directory+"/"+output_file) ) {
+        QDPIO::cout << "Overwriting!" << std::endl;
+        io_mode=HDF5Base::trunc;
+    }
+    
     HDF5Writer H5;
-    H5.open(output_file, HDF5Base::ate);
+    H5.open(output_directory+"/"+output_file, io_mode);
     H5.set_stripesize(STRIPE);
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
@@ -162,7 +184,7 @@ int main(int argc, char **argv){
             timed("Source position"){
         QDPIO::cout << "#         Get a source-to-all propagator S." << std::endl;
                 LatticePropagator all_from_point = zero;
-                XMLFileWriter xml_out("propagators.out.xml"); //TODO: make source-dependent?
+                XMLFileWriter xml_out(output_directory+"/propagators.out.xml"); //TODO: make source-dependent?
                 push(xml_out, "propagators");
                 push(xml_out, "all_from_point");
                 timed("initial solve") S.quarkProp(all_from_point, xml_out, point_source, state, Solver_Parameters, quarkSpinType, ncg_had);

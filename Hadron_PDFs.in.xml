@@ -17,7 +17,10 @@
 
 
     <output>
-        <file>/Users/evanberkowitz/src/Hadron_PDFs/without_transformation.hdf5</file>
+        <directory>/Users/evanberkowitz/src/Hadron_PDFs/output</directory>
+        <!-- <file>unit.hdf5</file> -->
+        <file>gauge.hdf5</file>
+        <overwrite>true</overwrite>
     </output>
 
     <source>
