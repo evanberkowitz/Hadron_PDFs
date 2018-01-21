@@ -1,5 +1,6 @@
 # compilation information constantly updated
 version.h
+output/*
 
 # Compiled Object files
 *.slo
