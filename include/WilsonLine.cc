@@ -32,7 +32,7 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     //
     // sum(real(trace(u[mu]*shift(u[nu],FORWARD,mu)*adj(shift(u[mu],FORWARD,nu))*adj(u[nu]))))
     //
-    // Here is a picture of the Chroma convention.
+    // Here is a picture of the APPARENT Chroma convention corresponding to the above code.
     //
     //        x + nu ----- U[mu](x+nu) ---> x + nu + mu
     //          ^                               ^
@@ -51,7 +51,35 @@ LatticeColorMatrix gauge_shift( const multi1d<LatticeColorMatrix> &U, const Latt
     //
     // So, if you have a color vector at x and you want to move it to x+mu, you need to multiply it by transpose(U[mu]) and then shift.
     // If you have something at x and you want to move it to x-mu, you shift it first and then multiply by conjugate(U[mu]).
-    return sign > 0 ? shift( transpose(U[dir]) * v, -1, dir) : conj(U[dir]) * shift(v, +1, dir);
+    //
+    // That would lead to a result
+    //
+    // return sign > 0 ? shift( transpose(U[dir]) * v, -1, dir) : conj(U[dir]) * shift(v, +1, dir);
+    //
+    // However, the above code is EXTREMELY MISLEADING!  
+    // The issue, is that the real part of the trace of the plaquette is equal to the trace of the dagger of the plaquette:
+    //
+    // Chroma::MesPlq == sum(real(trace(u[nu] * shift(u[mu], FORWARD, nu) * adj(shift(u[nu], FORWARD, mu)) * adj(u[mu]))))
+    //
+    // This leads to a picture:
+    //
+    //        x + nu <---- U[mu](x+nu) ---- x + nu + mu
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //       U[nu](x)                       U[nu](x+mu)
+    //          |                               |
+    //          |                               |
+    //          |                               |
+    //          v                               v
+    //          x    <----- U[mu](x) -------- x + mu
+    //
+    // so that if you have a color vector at x and you want to move it to x+mu you need to multiply it by adj(U[mu]) and then shift.
+    // If you have something at x and you want to move it to x-mu, you shift it first and then multiply U[mu].
+    //
+    // Using this convention, we have 
+    return sign > 0 ? shift( adj(U[dir]) * v, -1, dir) : U[dir] * shift(v, +1, dir);
 }
 
 LatticeColorMatrix WilsonLine::operator()(const multi1d<LatticeColorMatrix> &U){
