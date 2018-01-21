@@ -1,3 +1,4 @@
+#include "version.h"
 #include "standard_includes.h"
 #include <random>
 #include <cfloat>
