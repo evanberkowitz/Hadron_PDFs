@@ -1,27 +1,28 @@
 #include "standard_includes.h"
 #include "include/ParallelTransporter.h"
 
-// Parallel transport moves something from x to x + ∆, using the gauge links to move from site to site.
+// Parallel transport moves something from x+∆ to x, using the gauge links to move from site to site.
 // We already have the WilsonLine that, given a path through the lattice, produces the correct product of the gauge links
 // and stores that product at the destination.  Now we just need to shift our own data there and then multiply.
 
-// QDP++ allows us to define macroscopic shifts, which is much cheaper than performing repeated single-links shifts.
+// QDP++ allows us to define macroscopic shifts, which is much cheaper than performing repeated single-link shifts.
 // It requires a class that inherits from MapFunc.
 class jump : public MapFunc {
 public:
     jump(const multi1d<int> &displacement) : displacement(displacement) {};
     
     // That class needs the application operation that takes a multi1d representing the lattice location
+    // and produces the coordinates where data that lands at that location should originate from.
+    // Note that this exactly what we want---we have specified where the data we wind up with should have originated.
+    // That way, data that lands at 0 will have started at displacement.
     multi1d<int> operator()( const multi1d<int> &x, int sign=1 ) const {
-        // and produces the coordinates where data that lands at that location should originate from.
         multi1d<int> temp(Nd);
+        int dim=0;
         for(int d = 0 ; d < Nd; d++){
-        // Note that this is the opposite of what we want---we have specified where the data we have should go.
-        // Therefore, just as in WilsonLine.cc we need the opposite sign.  This way data at 0 will go to displacement,
-        // rather than vice-versa.
-        temp[d]=x[d] - sign*displacement[d];
-        while( temp[d] <= 0 ){ temp[d] += Layout::lattSize()[d] ;}
-        temp[d]=temp[d] % Layout::lattSize()[d];
+            temp[d]=x[d] + sign*displacement[d];            // Add the displacement
+            dim = Layout::lattSize()[d];                    // Make sure we land inside the lattice by
+            while( temp[d] <=  0  ){ temp[d] += dim ;}      //     adding to negative coordinates
+            temp[d]=temp[d] % dim;                          // and modding out by the dimension.
         }
         return temp;
     };
@@ -40,14 +41,45 @@ template<class T> OLattice<T> ParallelTransporter::enforce_boundary_conditions(c
     
     OLattice<T> copy, result=field;
 
-    for_direction(d){                                                                              // In principle, more than one direction may be antiperiodic---
-        if (periodicity[d] == 1) continue;                                                         // we can ignore the periodic directions
-        copy = where ( displacement[d] > Layout::latticeCoordinate(d) , (-1)*result, result);      // and flip the sign of everyplace that wrapped around.1
-        // TODO: what if the displacement wraps an antiperiodic direction more than once?
-        // With 2 seconds of thought I conjecture something like
-        // int wrap = displacement / Layout::latticeSize(d);        // is Layoute::latticeSize a function?
-        // copy = where ( displacement > Layout::latticeCoordinate(d) , (-1)^(wrap+1)*result, (-1)^wrap * result);
-        // but it deserves deeper thought.  Anyway, you shouldn't pick paths like that.  If you do you may be punished.
+    for_direction(d){                          // In principle, more than one direction may be antiperiodic---
+        if (periodicity[d] == 1) continue;     // we can ignore the periodic directions
+        //
+        //  Here's a schematic to understand where the signs are needed.  Assume a positive shift s (that is, s > 0):
+        if( displacement[d] > 0){
+        //  coordinate original     positive shift      antiperiodic
+        //
+        //  lattSize-1 +                                -       \______ These sites have (lattSize-1) - latticeCoordinate < s.
+        //             +                                -       /       The last site has LHS = 0.  The second to last site has LHS=1.
+        //  ...        +            +                   +               The LHS is nonnegative, so if s=0 no sign is applied.
+        //             +            +                   +               
+        //  2          +            +                   +               
+        //  1          +            +                   +               
+        //  0          +            +                   +               
+        //                          +                                   
+        //                          +                                   
+            copy = where ( Layout::lattSize()[d] - 1 - Layout::latticeCoordinate(d) < s, (-1)*result, result) ;
+
+        } else {
+        //  Now let's think about a negative shift s (that is, s < 0):
+        //
+        //  coordinate original     negative shift      antiperiodic
+        //
+        //                          +                                   
+        //                          +                                   
+        //  lattSize-1 +            +                   +           ___ These sites have latticeCoordinate < -s.
+        //             +            +                   +          |    The first site has LHS = 0.  The second LHS=1.
+        //  ...        +            +                   +          |    The LHS is nonnegative, so if s=0 no sign is applied.
+        //             +            +                   +          |    
+        //  2          +            +                   +          |    
+        //  1          +                                -       \__|    
+        //  0          +                                -       /       
+            copy = where ( Layout::latticeCoordinate(d) < -displacement[d], (-1)*result, result);
+        }
+        //
+        //  There may be a beutiful expression to capture both the positive and negative s cases.
+        //  However, with the above in hand, it doesn't cost us anything to just code both:
+
+        // TODO: what about the annoying case when the displacement wraps an antiperiodic direction more than once?
         result = copy;
     }
     return result;
