@@ -27,13 +27,13 @@ Action::Action(XMLReader& fermxml, const std::string& path){
 
 };
 
-State Action::state(const multi1d<LatticeColorMatrix> &U ){
+State Action::state(const multi1d<LatticeColorMatrix> &U ) const {
     QDPIO::cout << "Action::state..." << std::endl;
     State state = S->createState(U);
     return state;
 }
 
-System_Solver Action::solver(State &state, GroupXML_t solver_parameters){
+System_Solver Action::solver(State &state, GroupXML_t solver_parameters) const {
     QDPIO::cout << "Action::solver..." << std::endl;
     return S->qprop(state, solver_parameters);
 }

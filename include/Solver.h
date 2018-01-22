@@ -16,7 +16,7 @@
 class Solver{
 public:
     Solver( const Action &S, GroupXML_t solver_parameters, const multi1d<LatticeColorMatrix> &U );
-    void operator()(LatticePropagator& result, const LatticePropagator& source);
+    void operator()(LatticePropagator& result, const LatticePropagator& source) const;
     // TODO: It would be nice to require the ability to spit out XML.
 private:
     Handle< SystemSolver<LatticeFermion> > D_inv;

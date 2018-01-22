@@ -12,8 +12,8 @@ class Action {
 friend class Solver;
 public:
     Action(XMLReader& file, const std::string& path);
-    State state(const multi1d<LatticeColorMatrix> &U );
-    System_Solver solver(State &state, GroupXML_t solver_parameters);
+    State state(const multi1d<LatticeColorMatrix> &U ) const;
+    System_Solver solver(State &state, GroupXML_t solver_parameters) const;
 private:
     Handle<const WilsonTypeFermAct<LatticeFermion, multi1d<LatticeColorMatrix>, multi1d<LatticeColorMatrix> > > S;
     System_Solver sys_solver;

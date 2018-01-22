@@ -10,7 +10,7 @@ Solver::Solver( const Action &S, GroupXML_t solver_parameters, const multi1d<Lat
     D_inv = S.solver(state, solver_parameters);
 };
 
-void Solver::operator()(LatticePropagator& result, const LatticePropagator& source){
+void Solver::operator()(LatticePropagator& result, const LatticePropagator& source) const{
     LatticeFermion chi,psi;
     for(unsigned int c=0; c < Nc; c++){
         for(unsigned int s=0; s < Ns; s++){
