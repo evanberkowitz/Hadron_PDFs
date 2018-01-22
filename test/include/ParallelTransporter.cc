@@ -64,27 +64,28 @@ int main(int argc, char **argv){
     QDPIO::cout << "nothing actually has to *move* anywhere.  We should make sure to test that things wind up where claimed" << std::endl;
     
     QDPIO::cout << "First, let's just push the unit matrix through one link." << std::endl;
-    QDPIO::cout << "Creating the lattice of unit matrices..." << std::endl;
+    QDPIO::cout << "Creating the lattice of unit matrices..." << std::flush;
     Real one=1.0;
     LatticeColorMatrix ONE=one;
+    QDPIO::cout << "done!" << std::endl;
     
     for_direction(d){
-        // QDPIO::cout << "Now, we can push it through the gauge field in the " << d << " direction..." << std::endl;
+        QDPIO::cout << "Now, we can pull it through the gauge field in the " << d << " direction..." << std::endl;
         std::string ds=int_to_string(d);
-        ParallelTransporter push(links, ds+":1");
-        LatticeColorMatrix pushed=push(ONE);
-        Double ip=real(innerProduct(transpose(links[d]), shift(pushed,FORWARD,d)));
+        ParallelTransporter push(links, ds+":+1");
+        LatticeColorMatrix pulled=push(ONE);
+        // Double ip=real(innerProduct(shift(links[d],BACKWARD,d),adj(pushed)));
+        Double ip=real(innerProduct(links[d], pulled));
         double ip_norm=toDouble(ip)/double(Nc*Layout::vol()) ;
-        // QDPIO::cout << "Normalizing by volume and Nc, one finds " << ip_norm << std::endl;
+        QDPIO::cout << "Normalizing by volume and Nc, one finds " << ip_norm << std::endl;
         if( abs(ip_norm - 1.0) > tol) {
             QDPIO::cout << "FAIL!  The global consistency check is too different."  << std::endl;
+            QDPIO::cout << "The normalized inner product is " << ip_norm << std::endl;
             QDP_abort(EXIT_FAILURE);
         } 
-        // else{
-        //     QDPIO::cout << "PASS!  They match to " << tol << " or better." << std::endl;
-        // }
-        // QDPIO::cout << "But, if there was some crazy bug, there could accidentally be a conspiracy." << std::endl;
-        // QDPIO::cout << "Let's check site-by-site..." << std::endl;
+        QDPIO::cout << "PASS!  They match to " << tol << " or better." << std::endl;
+        QDPIO::cout << "But, if there was some crazy bug, there could accidentally be a conspiracy." << std::endl;
+        QDPIO::cout << "Let's check site-by-site..." << std::endl;
         LatticeReal IP=1.0;
         LatticeInt  PASS=1;
     
@@ -93,7 +94,7 @@ int main(int argc, char **argv){
         int pass_count=Layout::vol();
         for( eps=1.0; pass_count == Layout::vol(); eps/=2){
             QDPIO::cout << "." << std::flush;
-            IP=real(localInnerProduct(transpose(links[d]), shift(pushed, FORWARD, d)));
+            IP=real(localInnerProduct(links[d],pulled));
             PASS=where( fabs(IP-Nc) > eps, 0, 1 );
             pass_count=toInt(sum(PASS));
         }
@@ -106,8 +107,46 @@ int main(int argc, char **argv){
     
 
     QDPIO::cout << "PASS!  Tolerance is " << tol << std::endl;
-    QDPIO::cout << "This demonstrates that one-site hops work." << std::endl;
+    QDPIO::cout << "This demonstrates that positive one-site transport work.\n\n" << std::endl;
     
+    for_direction(d){
+        QDPIO::cout << "Now, we can pull it through the gauge field in the negative " << d << " direction..." << std::endl;
+        std::string ds=int_to_string(d);
+        ParallelTransporter push(links, ds+":-1");
+        LatticeColorMatrix pulled=push(ONE);
+        Double ip=real(innerProduct(shift(adj(links[d]), BACKWARD, d), pulled));
+        double ip_norm=toDouble(ip)/double(Nc*Layout::vol()) ;
+        QDPIO::cout << "Normalizing by volume and Nc, one finds " << ip_norm << std::endl;
+        if( abs(ip_norm - 1.0) > tol) {
+            QDPIO::cout << "FAIL!  The global consistency check is too different."  << std::endl;
+            QDPIO::cout << "The normalized inner product is " << ip_norm << std::endl;
+            QDP_abort(EXIT_FAILURE);
+        }
+        QDPIO::cout << "PASS!  They match to " << tol << " or better." << std::endl;
+        QDPIO::cout << "But, if there was some crazy bug, there could accidentally be a conspiracy." << std::endl;
+        QDPIO::cout << "Let's check site-by-site..." << std::endl;
+        LatticeReal IP=1.0;
+        LatticeInt  PASS=1;
+    
+        QDPIO::cout << "Direction " << d << " agrees to " << std::flush;
+        double eps=0.0;
+        int pass_count=Layout::vol();
+        for( eps=1.0; pass_count == Layout::vol(); eps/=2){
+            QDPIO::cout << "." << std::flush;
+            IP=real(localInnerProduct(shift(adj(links[d]), BACKWARD, d), pulled));
+            PASS=where( fabs(IP-Nc) > eps, 0, 1 );
+            pass_count=toInt(sum(PASS));
+        }
+        QDPIO::cout << eps << std::endl;
+        if( eps > tol ){
+            QDPIO::cout << "FAIL!  This is too different---tolerance is " << tol << std::endl;
+            QDP_abort(EXIT_FAILURE);
+        } 
+    }
+    
+
+    QDPIO::cout << "PASS!  Tolerance is " << tol << std::endl;
+    QDPIO::cout << "This demonstrates that negative one-site transport work." << std::endl;
     
     
     QDPIO::cout << banner("Multi-link shifts") << std::endl;
@@ -184,7 +223,7 @@ int main(int argc, char **argv){
     QDPIO::cout << banner("Multi-link shifts: a long-distance path and its reverse undo one another") << std::endl;
     
     
-    multi2d<ParallelTransporter*> FWD_BWD(5,2);
+    multi2d<ParallelTransporter*> FWD_BWD(6,2);
     
     LatticeColorMatrix fwd=zero, bwd=zero;
     timed("Long-distance transport test") for( int fwd_bwd_test_count = 0; fwd_bwd_test_count < 10; fwd_bwd_test_count++ ){
