@@ -248,9 +248,9 @@ Path Path::reverse(){
     return r;
 }
 
-std::string Path::short_string(){
+std::string Path::short_string() const {
     return multi2d_int_to_string(compressed);
 }
-std::string Path::long_string(){
+std::string Path::long_string() const {
     return multi2d_int_to_string(dx);
 }

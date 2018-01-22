@@ -25,18 +25,18 @@ public:
     // TODO: specify a format.
     Path(const std::string  &P);
     // You can ask for the displacement from the start of the path to the end of the path.
-    multi1d<int> total_displacement(){ return displacement; };
+    multi1d<int> total_displacement() const { return displacement; };
     
     // You might want to reverse a path.
     Path reverse();
     
     // Some paths might be zero links long.  That is DIFFERENT from having total_displacement() == 0!
-    bool is_nonzero(){ return !zero_path; };
-    bool is_zero()   { return  zero_path; };
+    bool is_nonzero() const { return !zero_path; };
+    bool is_zero()    const { return  zero_path; };
     
     // A path can be turned into a string:
-    std::string short_string();
-    std::string  long_string();
+    std::string short_string() const;
+    std::string  long_string() const;
 
     // You can destroy a path.
    ~Path(){  };
