@@ -19,9 +19,6 @@ DIR_CHROMA:=$(DIR_USQCD)/chroma
 DIR_XML2:=/usr/local/opt/libxml2
 DIR_FFTW:=/usr/local
 
-PYTHON_CONFIG:=/usr/local/Cellar/python/2.7.13/bin/python-config
-SWIG:=$(shell which swig)
-
 DIR_INSTALL:=.
 
 ######
@@ -110,13 +107,6 @@ all:
 	make Hadron_PDFs.x
 	make tests
 
-_%.so : $(UTILITIES) $(OBJECTS) %_wrap.o
-	$(CXX) $(DEFINES) $(FLAGS_LD) $(UTILITIES) $(OBJECTS) -shared $*_wrap.o -o $@ $(LIBS)
-
-%_wrap.o:
-	$(SWIG) -python -c++ -o $*_wrap.cc $*.i
-	$(CXX) $(FLAGS_CXX) $(DEFS) -c $*_wrap.cc -o $@
-
 %.o : %.cc
 	$(CXX) $(FLAGS_CXX) $(DEFS) -c $< -o $@
 
@@ -133,17 +123,8 @@ tests :
 	make test/utility/{sign,version}.x 
 	make test/include/{ParallelTransporter,Path}.x
 	
-.PHONY: python
-python:
-	make include/_Action.so
-	make include/_Solver.so
-
 .PHONY: clean
 clean:
 	find . -name '*.o'        -delete
-	find . -name '*.so'       -delete
 	find . -name '*.x'        -delete
-	find . -name '*.pyc'      -delete
-	find . -name '*.py'       -delete
-	find . -name '*_wrap.cc'  -delete
 	$(RM) $(GIT_STATUS)
