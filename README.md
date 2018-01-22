@@ -24,6 +24,8 @@ Below is a schematic of the correlation functions of interest.
 
 ![PDF](/hadron_pdfs.gif)
 
+The big black circles are supposed to represent baryons, black line on top an incident electron.  The electron talks to valence quarks via photons.  When hard enough, processes like this factorize, and we need only to worry about the behavior of the quarks.  Here, one quark gets hit by a photon, goes a long for a bit, and emits a photon.  Between the two photons we use a Wilson line to transport the quark, rather than letting it propagate according to the Dirac equation.  We want to know the value of the matrix element as a function of the length of this Wilson line, the momenta injected at the electromagnetic interactions, and the asymptotic particle momentum.
+
 # Method
 
 The [Feynman-Hellman (FH) method][fh] is a technique for measuring hadronic matrix elements, normally requiring a three-point function, into a two-point function which can be analyzed with familiar effective-mass techniques.  Here we apply this technique to PDFs.
