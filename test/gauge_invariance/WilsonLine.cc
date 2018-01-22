@@ -1,4 +1,6 @@
+#include "Hadron_PDFs.h"
 #include "standard_includes.h"
+
 #include <random>
 #include <cfloat>
 #include "include/Plaquette.h"
