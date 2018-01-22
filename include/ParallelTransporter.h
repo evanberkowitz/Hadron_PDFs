@@ -21,7 +21,7 @@ public:
     ParallelTransporter();
     ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const Path &P);
     ParallelTransporter(const multi1d<LatticeColorMatrix> &U, const std::string P);
-    ParallelTransporter(const LatticeColorMatrix &product_of_links, const multi1d<int> &displacement);
+    ParallelTransporter(const LatticeColorMatrix &product_of_links, const multi1d<int> &disp);
     ParallelTransporter(const ParallelTransporter &p);
     LatticeReal         operator()(const LatticeReal        &R, bool antiperiodic=false);
     LatticeComplex      operator()(const LatticeComplex     &C, bool antiperiodic=false);
