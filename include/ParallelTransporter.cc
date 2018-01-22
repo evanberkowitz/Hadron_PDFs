@@ -57,8 +57,8 @@ template<class T> OLattice<T> ParallelTransporter::enforce_boundary_conditions(c
         //  0          +            +                   +               
         //                          +                                   
         //                          +                                   
-            copy = where ( Layout::lattSize()[d] - 1 - Layout::latticeCoordinate(d) < s, (-1)*result, result) ;
-
+            copy = where ( Layout::lattSize()[d] - 1 - Layout::latticeCoordinate(d) < displacement[d], (-1)*result, result) ;
+            
         } else {
         //  Now let's think about a negative shift s (that is, s < 0):
         //
@@ -77,7 +77,6 @@ template<class T> OLattice<T> ParallelTransporter::enforce_boundary_conditions(c
         }
         //
         //  There may be a beutiful expression to capture both the positive and negative s cases.
-        //  However, with the above in hand, it doesn't cost us anything to just code both:
 
         // TODO: what about the annoying case when the displacement wraps an antiperiodic direction more than once?
         result = copy;
