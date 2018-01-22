@@ -4,7 +4,6 @@
 
 CC:=mpicc
 CXX:=mpicxx
-MAC:=1
 OPT:= -O3
 OPENMP:=1
 
