@@ -9,8 +9,8 @@
 
     <configuration>
         <annotation>Optionally include a boolean randomize tag to apply a random gauge transformation.</annotation>
-        <cfg_type>UNIT</cfg_type>
-        <!-- <cfg_type>SZINQIO</cfg_type> -->
+        <!-- <cfg_type>UNIT</cfg_type> -->
+        <cfg_type>SZINQIO</cfg_type>
         <cfg_file>/Users/evanberkowitz/src/lattice_pion_pdf/wilson_k0.1665_b5.32144_4by32_cfg_4000.lime</cfg_file>
         <!-- <randomize>true</randomize> -->
     </configuration>
@@ -18,8 +18,8 @@
 
     <output>
         <directory>/Users/evanberkowitz/src/Hadron_PDFs/output</directory>
-        <file>unit.hdf5</file>
-        <!-- <file>gauge.hdf5</file> -->
+        <!-- <file>unit.hdf5</file> -->
+        <file>gauge.hdf5</file>
         <!-- <file>gauge.transformed.hdf5</file> -->
         <!-- <file>unit.transformed.hdf5</file> -->
         <overwrite>true</overwrite>
@@ -37,8 +37,10 @@
 
     <paths>
         <elem>1:0;</elem>
-        <elem>2:0;</elem>
         <elem>2:-2;</elem>
+        <elem>2:-1;</elem>
+        <elem>2:0;</elem>
+        <elem>2:1;</elem>
         <elem>2:2;</elem>
     </paths>
 
