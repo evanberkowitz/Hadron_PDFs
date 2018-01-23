@@ -9,13 +9,13 @@
 #include "actions/ferm/invert/syssolver_linop_cg.h"
 
 bool linkageHack(){
-	bool foo=true;
+    bool status=true;
 
-    foo &= InlineAggregateEnv::registerAll();
-    foo &= GaugeInitEnv::registerAll();
-    foo &= LinOpSysSolverCGEnv::registerAll();
+    status &= InlineAggregateEnv::registerAll();
+    status &= GaugeInitEnv::registerAll();
+    status &= LinOpSysSolverCGEnv::registerAll();
 
-	return foo;
+    return status;
 }
 
 namespace Hadron_PDFs {

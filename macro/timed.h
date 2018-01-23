@@ -6,7 +6,7 @@
 #include <string>
 
 // Use only after Chroma::initialize or the QDPIO will segfault.
-#define timed(msg) 	for(Timer MACRO_CLOCK_TIMER((msg)); MACRO_CLOCK_TIMER.loop; MACRO_CLOCK_TIMER.loop = false)
+#define timed(msg)  for(Timer MACRO_CLOCK_TIMER((msg)); MACRO_CLOCK_TIMER.loop; MACRO_CLOCK_TIMER.loop = false)
 // This macro creates a one-time-through for loop that gets optimized away except for the desired side effects
 // of starting and stopping (and reporting) a stopwatch.
 
