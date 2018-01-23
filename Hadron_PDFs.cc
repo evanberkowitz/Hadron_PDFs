@@ -37,6 +37,9 @@ int main(int argc, char **argv){
     XMLReader XML;
     XML.open(Chroma::getXMLInputFileName());
     
+    lattice_parameters lattice;
+    read(XML, "/Hadron_PDFs/lattice", lattice);
+    
     QDPIO::cout << banner("Get the configuration:") << std::endl;
     
     multi1d<LatticeColorMatrix> U(Nd);
@@ -87,7 +90,13 @@ int main(int argc, char **argv){
     LatticePropagator point_source = zero;
     point_source = PointSource(source_position, Nd-1);
     
-    
+    QDPIO::cout << "Creating shifter to zero correlators..." << std::flush;
+    // If the source is on t=8, we want to use the parallel transporter to move data from t=8 to t=0.
+    // Because of the whole QDP sense of shifts, that's a POSITIVE shift:
+    std::string time_shift=int_to_string(lattice.time_direction)+":+"+int_to_string(source_position[lattice.time_direction])+";";
+    QDPIO::cout << " using " << time_shift << "... " << std::flush;
+    ParallelTransporter shift_source_to_time_zero(U, time_shift);
+    QDPIO::cout << "done!" << std::endl;
     
     QDPIO::cout << banner("Construct action, solver:") << std::endl;
     
@@ -167,7 +176,9 @@ int main(int argc, char **argv){
     H5.set_stripesize(STRIPE);
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
+#ifdef DEBUG
     H5.mkdir("/transporters");
+#endif
     
     QDPIO::cout << banner("Main Loop:") << std::endl;
     
@@ -192,17 +203,18 @@ int main(int argc, char **argv){
                 pop(xml_out);
                 // SOL(all_from_point, point_source);
                 
-                H5.write("/propagators/all_point", all_from_point, HDF5Base::trunc);
+                H5.write("/propagators/all_from_pt", all_from_point, HDF5Base::trunc);
                 
         QDPIO::cout << "#         Build the pion correlator, as usual." << std::endl;
                 LatticeComplex pion = trace( all_from_point * adj(all_from_point) );
-                H5.write("/pions/two_point", pion, HDF5Base::trunc);
+                LatticeComplex pion_shifted = shift_source_to_time_zero(pion);
         // QDPIO::cout << "#         Build the nucleon correlator, as usual." << std::endl;
         //         LatticeSpinMatrix nucleon = zero;
         //         // nucleon += ...
         //         H5.write("/nucleon",nucleon, HDF5Base::trunc);
         QDPIO::cout << "#         Write out the correlators and the propagator (only keep the current propagator)." << std::endl;
-        
+                H5.write("/pions/all_from_pt", pion_shifted, HDF5Base::trunc);
+                
         QDPIO::cout << "#         Do in a checkpointed way:" << std::endl;
         QDPIO::cout << "#         For each incoming photon (momentum and spinor index)" << std::endl;
         QDPIO::cout << "#         For each path you want to parallel transport your quark along" << std::endl;
@@ -222,10 +234,12 @@ int main(int argc, char **argv){
                     QDPIO::cout << "Path has total displacement" << std::flush;
                     for(unsigned int d=0; d<displacement.size(); d++) QDPIO::cout << " " << displacement[d] << std::flush;
                     QDPIO::cout << std::endl;
+#ifdef DEBUG
                     QDPIO::cout << "Writing transporter..." << std::flush;
                     H5.mkdir("/transporters/wilson("+path_specifier[p]+")");
                     transport.write(H5, "/transporters/wilson("+path_specifier[p]+")");
                     QDPIO::cout << "done!" << std::endl;
+#endif
                     
                     QDPIO::cout << "Creating second photon..." << std::flush;
                     // LatticeComplex second_photon = phases(photons[q].outgoing);
@@ -237,7 +251,9 @@ int main(int argc, char **argv){
                     QDPIO::cout << "Transporting quark..." << std::flush;
                     LatticePropagator W_all_from_point = Gamma(8)*transport(all_from_point);
                     QDPIO::cout << "done!" << std::endl;
+#ifdef DEBUG
                     H5.write("/propagators/FH_SOURCE_"+path_specifier[p], W_all_from_point, HDF5Base::trunc );
+#endif
                     
                     QDPIO::cout << "Allocating new propagator..." << std::flush;
                     LatticePropagator all_from_W_all_from_point = zero;
@@ -252,24 +268,25 @@ int main(int argc, char **argv){
                     xml_out.flush();
                     pop(xml_out);
                     
-                    H5.write("/propagators/"+description, W_all_from_point, HDF5Base::trunc);
+                    H5.write("/propagators/"+description, all_from_W_all_from_point, HDF5Base::trunc);
                     
-        QDPIO::cout << "#             Use that propagator (and the original propagator) to build the pion and nucleon correlators.  Fourier transform." << std::endl;                    
+        QDPIO::cout << "#             Use that propagator (and the original propagator) to build the pion and nucleon correlators." << std::endl;                    
                     
                     LatticeComplex pion_A = - trace( all_from_W_all_from_point * adj(all_from_point) );
                     
         QDPIO::cout << "#             This yields full-volume correlators, " << std::endl;
-        QDPIO::cout << "#                  <   destroyed with every momentum (p)" << std::endl;
+        QDPIO::cout << "#                  <   destroyed at every spacetime location" << std::endl;
         QDPIO::cout << "#                      hard outgoing photon with definite momentum" << std::endl;
-        QDPIO::cout << "#                      Wilson line" << std::endl;
+        QDPIO::cout << "#                      gamma_z * Wilson line" << std::endl;
         QDPIO::cout << "#                      hard ingoing photon with definite momentum" << std::endl;
         QDPIO::cout << "#                      created at point >" << std::endl;
         QDPIO::cout << "#             For each sink-side momentum, we know the source-side momentum by conservation." << std::endl;
-        QDPIO::cout << "#             Write out the full (momentum-)volume correlator." << std::endl;
+        QDPIO::cout << "#             Write out the full volume correlator." << std::endl;
                     
-                    H5.write("/pions/A_"+description, pion_A, HDF5Base::trunc);
+                    LatticeComplex pion_A_shifted = shift_source_to_time_zero(pion_A);
+                    H5.write("/pions/A_"+description, pion_A_shifted, HDF5Base::trunc);
                     
-        QDPIO::cout << "#             Do analysis offline." << std::endl;
+        QDPIO::cout << "#             Do analysis, including fourier transform to momentum space, offline." << std::endl;
                 }
                 
                 pop(xml_out);
