@@ -10,37 +10,37 @@
 
 bool linkageHack(){
     bool status=true;
-
+    
     status &= InlineAggregateEnv::registerAll();
     status &= GaugeInitEnv::registerAll();
     status &= LinOpSysSolverCGEnv::registerAll();
-
+    
     return status;
 }
 
 namespace Hadron_PDFs {
 
 void initialize(int *argc, char ***argv){
-
+    
     // Parse flags?
-
+    
     // Initialize the chroma underlayer.
     Chroma::initialize(argc, argv);
-
+    
     // Report on linkage hack.
     bool lH=linkageHack();
     
     QDPIO::cout << "Linkage Hack returned " << ( lH ? "true" : "false") << std::endl;
-
+    
     // Install signal handlers here.
     // Use an #ifndef to include the appropriate header above,
     // and then un-comment the below
     #ifdef SIGNAL_HANDLERS
          signal_handlers::install();
     #endif
-
+         
     // DEBUG_PRINT("DEBUG ENABLED");
-
+         
     QDPIO::cout << Hadron_PDFs_compilation() << std::endl;
     
     if( ! file_exists(Chroma::getXMLInputFileName()) ){

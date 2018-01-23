@@ -28,7 +28,7 @@ void read(XMLReader &xml_input, const std::string &path, photon_pair &p){
 }
 
 int main(int argc, char **argv){
-
+    
     StopWatch swatch_everything;
     swatch_everything.reset();
     swatch_everything.start();
@@ -36,9 +36,9 @@ int main(int argc, char **argv){
     Hadron_PDFs::initialize(&argc, &argv);
     XMLReader XML;
     XML.open(Chroma::getXMLInputFileName());
-
+    
     QDPIO::cout << banner("Get the configuration:") << std::endl;
-
+    
     multi1d<LatticeColorMatrix> U(Nd);
     Cfg_t configuration;
     read(XML, "/Hadron_PDFs/configuration", configuration);
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
         randomize_configuration = false;
     }
     
-
+    
     QDPIO::cout << "Configuration:" << configuration.cfg_file << std::endl;
     QDPIO::cout << "    reading..." << std::endl;
     XMLReader gauge_file_xml, gauge_xml;
@@ -58,7 +58,7 @@ int main(int argc, char **argv){
     unitarityCheck(U);
     
     QDPIO::cout << configuration.cfg_file << " read successfully, unitarity check passed." << std::endl;
-
+    
     if(randomize_configuration){
         QDPIO::cout << "Doing a random gauge transformation... " << std::flush;
         rgauge(U);
@@ -66,11 +66,11 @@ int main(int argc, char **argv){
     } else {
         QDPIO::cout << "Not applying any random gauge transformation. " << std::endl;
     }
-
-
-
+    
+    
+    
     QDPIO::cout << banner("Construct the source:") << std::endl;
-
+    
     multi1d<int> source_position;
     read(XML, "/Hadron_PDFs/source/position", source_position);
     if( Nd != source_position.size() ){
@@ -83,14 +83,14 @@ int main(int argc, char **argv){
     QDPIO::cout << "Source position = " << std::flush;
     for(unsigned int i=0; i<source_position.size(); i++) QDPIO::cout << source_position[i] << " " << std::flush;
     QDPIO::cout << std::endl;
-
+    
     LatticePropagator point_source = zero;
     point_source = PointSource(source_position, Nd-1);
-
-
-
+    
+    
+    
     QDPIO::cout << banner("Construct action, solver:") << std::endl;
-
+    
     SimpleFermBCParams fermion_boundary_conditions;
     read(XML, "/Hadron_PDFs/lattice/fermionic_boundary_conditions", fermion_boundary_conditions.boundary);
     QDPIO::cout << "Fermionic boundary conditions: " << std::flush;
@@ -98,15 +98,15 @@ int main(int argc, char **argv){
     QDPIO::cout << std::endl;
     Handle< FermBC< FERMION > > Light_Boundary_Condition_Handle(new SimpleFermBC< FERMION >(fermion_boundary_conditions));
     Handle<CreateFermState< FERMION >> Light_Fermion_State(new CreateSimpleFermState< FERMION >(Light_Boundary_Condition_Handle));
-
+    
     Real mass=0.;
     read(XML, "/Hadron_PDFs/FermionAction/light/Mass", mass);
     QDPIO::cout << "Light quark mass = " << mass << std::endl;
-
+    
     QDPIO::cout << "Constructing action..." << std::flush;
     EvenOddPrecWilsonFermAct S(Light_Fermion_State, mass);
     QDPIO::cout << "done!" << std::endl;
-
+    
     QDPIO::cout << "Reading high precision inverter..." << std::flush;
     XMLReader read_solver(XML, "/Hadron_PDFs/Inverter");
     GroupXML_t Solver_Parameters = readXMLGroup(read_solver, "HighPrecision", "invType");
@@ -118,12 +118,12 @@ int main(int argc, char **argv){
     QDPIO::cout << "Constructing state..." << std::flush;
     Handle<FermState< FERMION > > state(S.createState(U));
     QDPIO::cout << "done!" << std::endl;
-
+    
     QuarkSpinType quarkSpinType = QUARK_SPIN_TYPE_FULL;
     int ncg_had = 0;
-
-
-
+    
+    
+    
     QDPIO::cout << banner("Determine observables...") << std::endl;
     
     multi1d<std::string> path_specifier;
@@ -134,7 +134,7 @@ int main(int argc, char **argv){
     read(XML, "/Hadron_PDFs/photons", photons);
     
     
-
+    
     QDPIO::cout << banner("Prepare output file...") << std::endl;
     
     std::string output_directory="";
@@ -168,16 +168,16 @@ int main(int argc, char **argv){
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
     H5.mkdir("/transporters");
-
+    
     QDPIO::cout << banner("Main Loop:") << std::endl;
-
+    
     XML.close();
     read_solver.close();
     
     timed("Hadron_PDFs"){
-    
+        
         QDPIO::cout << "# Currently I describe the isospin limit, and consider light quarks only." << std::endl;
-    
+        
         QDPIO::cout << "# For the configuration" << std::endl;
         timed("Configuration"){
         QDPIO::cout << "#     For each source position" << std::endl;        
@@ -202,7 +202,7 @@ int main(int argc, char **argv){
         //         // nucleon += ...
         //         H5.write("/nucleon",nucleon, HDF5Base::trunc);
         QDPIO::cout << "#         Write out the correlators and the propagator (only keep the current propagator)." << std::endl;
-
+        
         QDPIO::cout << "#         Do in a checkpointed way:" << std::endl;
         QDPIO::cout << "#         For each incoming photon (momentum and spinor index)" << std::endl;
         QDPIO::cout << "#         For each path you want to parallel transport your quark along" << std::endl;
@@ -237,6 +237,7 @@ int main(int argc, char **argv){
                     QDPIO::cout << "Transporting quark..." << std::flush;
                     LatticePropagator W_all_from_point = Gamma(8)*transport(all_from_point);
                     QDPIO::cout << "done!" << std::endl;
+                    H5.write("/propagators/FH_SOURCE_"+path_specifier[p], W_all_from_point, HDF5Base::trunc );
                     
                     QDPIO::cout << "Allocating new propagator..." << std::flush;
                     LatticePropagator all_from_W_all_from_point = zero;
@@ -277,9 +278,9 @@ int main(int argc, char **argv){
         }
     }
     
-
-
-
+    
+    
+    
     QDPIO::cout << banner("Finalize") << std::endl;
     H5.close();
     Chroma::finalize();
