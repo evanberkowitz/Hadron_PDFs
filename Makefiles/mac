@@ -6,6 +6,7 @@ CC:=mpicc
 CXX:=mpicxx
 OPT:= -O3
 OPENMP:=1
+DEBUG=0
 
 ######
 ###### Dependency Paths
@@ -68,17 +69,30 @@ INCLUDES:=-I. $(shell $(DIR_CHROMA)/bin/chroma-config --cxxflags) $(INCLUDES_FFT
 LIBS:=$(shell $(DIR_CHROMA)/bin/chroma-config --ldflags) $(shell $(DIR_CHROMA)/bin/chroma-config --libs) -ldl $(LIB_FFT)
 
 ######
+###### DEBUG
+######
+
+ifeq ($(DEBUG),1)
+DEBUG_DEF:= -DDEBUG 
+DEBUG_CXX:= 
+else
+DEBUG_DEF:=
+DEBUG_CXX:= 
+endif
+
+
+######
 ###### DEFINES
 ######
 
-DEFS:=-DDEBUG -DBLAS_TRAILING_UNDERSCORE $(DEF_GIT) -D_GLIBC_USE_CXX1_ABI=0
+DEFS:=$(DEBUG_DEF) -DBLAS_TRAILING_UNDERSCORE $(DEF_GIT) -D_GLIBC_USE_CXX1_ABI=0
 
 ######
 ###### FLAGS
 ######
 
 FLAGS_C =   $(FLAG_OMP) -g -std=gnu99 -march=native -ffunction-sections -fdata-sections $(DEFS) $(OPT) $(INCLUDES)
-FLAGS_CXX = $(FLAG_OMP) -g -ffunction-sections -fdata-sections $(DEBUG) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
+FLAGS_CXX = $(FLAG_OMP) -g -ffunction-sections -fdata-sections $(DEBUG_CXX) $(DEFINES) $(OPT) $(INCLUDES) # -std=gnu++11 -march=native
 FLAGS_LD =  $(FLAG_OMP) #-Wl,--gc-sections
 
 ifeq ($(MKL),1)
