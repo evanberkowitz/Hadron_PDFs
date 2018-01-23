@@ -101,6 +101,9 @@ OBJECTS:=include/Path.o include/WilsonLine.o include/ParallelTransporter.o inclu
 
 .PRECIOUS: %.o
 
+default:
+	make Hadron_PDFs.x
+
 .PHONY: all
 all:
 	make Hadron_PDFs.x
