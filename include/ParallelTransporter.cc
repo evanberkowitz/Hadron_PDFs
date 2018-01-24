@@ -152,6 +152,12 @@ LatticeFermion      ParallelTransporter::operator()(const LatticeFermion        
     return result;
 }
 
+LatticeSpinMatrix   ParallelTransporter::operator()(const LatticeSpinMatrix     &S, bool antiperiodic){
+    LatticeSpinMatrix temp = shifter(S);
+    LatticeSpinMatrix result = antiperiodic ? enforce_boundary_conditions(temp) : temp;
+    return result;
+}
+
 LatticePropagator   ParallelTransporter::operator()(const LatticePropagator     &S, bool antiperiodic){
     LatticePropagator temp = WL*shifter(S);
     LatticePropagator result = antiperiodic ? enforce_boundary_conditions(temp) : temp;

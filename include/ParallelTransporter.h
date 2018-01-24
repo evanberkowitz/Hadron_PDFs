@@ -28,6 +28,7 @@ public:
     LatticeColorVector  operator()(const LatticeColorVector &V, bool antiperiodic=false);
     LatticeColorMatrix  operator()(const LatticeColorMatrix &M, bool antiperiodic=false);
     LatticeFermion      operator()(const LatticeFermion     &F, bool antiperiodic=true );
+    LatticeSpinMatrix   operator()(const LatticeSpinMatrix  &S, bool antiperiodic=true );
     LatticePropagator   operator()(const LatticePropagator  &S, bool antiperiodic=true );
     multi1d<int> total_displacement(){ return displacement; };
     void write(HDF5Writer &H5, std::string path);
