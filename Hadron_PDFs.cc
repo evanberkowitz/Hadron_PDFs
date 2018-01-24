@@ -2,6 +2,7 @@
 #include "standard_includes.h"
 #include "include/PointSource.h"
 #include "io/parameters/wilson_line.h"
+#include "io/parameters/output_file.h"
 #include "include/ParallelTransporter.h"
 #include "include/Photon.h"
 
@@ -130,33 +131,35 @@ int main(int argc, char **argv){
     
     QDPIO::cout << banner("Prepare output file...") << std::endl;
     
-    std::string output_directory="";
-    std::string output_file="";
-    read(XML, "/Hadron_PDFs/output/directory", output_directory);
-    read(XML, "/Hadron_PDFs/output/file", output_file);
-    bool overwrite=false;
-    try {
-        read(XML, "/Hadron_PDFs/output/overwrite", overwrite);
-    } catch( const std::string &error ) {
-        QDPIO::cout << "By default, not overwriting." << std::endl;
-        overwrite = false;
-    }
+    output out;
+    read(XML, "/Hadron_PDFs/output", out);
+    // std::string output_directory="";
+    // std::string output_file="";
+    // read(XML, "/Hadron_PDFs/output/directory", output_directory);
+    // read(XML, "/Hadron_PDFs/output/file", output_file);
+    // bool overwrite=false;
+    // try {
+    //     read(XML, "/Hadron_PDFs/output/overwrite", overwrite);
+    // } catch( const std::string &error ) {
+    //     QDPIO::cout << "By default, not overwriting." << std::endl;
+    //     overwrite = false;
+    // }
     
-    QDPIO::cout << "Output directory is " << output_directory << std::endl;
-    QDPIO::cout << "Output file is      " << output_file << std::endl;
-    if( file_exists(output_directory+"/"+output_file) && ! overwrite){
+    QDPIO::cout << "Output directory is " << out.directory << std::endl;
+    QDPIO::cout << "Output file is      " << out.file << std::endl;
+    if( file_exists(out.directory+"/"+out.file) && ! out.overwrite){
         QDPIO::cout << "File exists and overwrite isn't true." << std::endl;
         QDPIO::cout << "Exiting for safety" << std::endl;
         QDP_abort(-1);
     }
     HDF5Base::writemode io_mode=HDF5Base::ate;
-    if( overwrite && file_exists(output_directory+"/"+output_file) ) {
+    if( out.overwrite && file_exists(out.directory+"/"+out.file) ) {
         QDPIO::cout << "Overwriting!" << std::endl;
         io_mode=HDF5Base::trunc;
     }
     
     HDF5Writer H5;
-    H5.open(output_directory+"/"+output_file, io_mode);
+    H5.open(out.directory+"/"+out.file, io_mode);
     H5.set_stripesize(STRIPE);
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
@@ -182,7 +185,7 @@ int main(int argc, char **argv){
             timed("Source position"){
         QDPIO::cout << "#         Get a source-to-all propagator S." << std::endl;
                 LatticePropagator all_from_point = zero;
-                XMLFileWriter xml_out(output_directory+"/propagators.out.xml"); //TODO: make source-dependent?
+                XMLFileWriter xml_out(out.directory+"/propagators.out.xml"); //TODO: make source-dependent?
                 push(xml_out, "propagators");
                 push(xml_out, "all_from_"+source);
                 timed("initial solve") S.quarkProp(all_from_point, xml_out, point_source, state, Solver_Parameters, quarkSpinType, ncg_had);
@@ -194,7 +197,9 @@ int main(int argc, char **argv){
         QDPIO::cout << "#         Build the pion correlator, as usual." << std::endl;
                 LatticeComplex pion = trace( all_from_point * adj(all_from_point) );
                 LatticeComplex pion_shifted = shift_source_to_time_zero(pion);
+                
         // QDPIO::cout << "#         Build the nucleon correlator, as usual." << std::endl;
+                // TODO: build the nucleon here, shift it, write it out below.
         //         LatticeSpinMatrix nucleon = zero;
         //         // nucleon += ...
         //         H5.write("/nucleon",nucleon, HDF5Base::trunc);
@@ -267,6 +272,8 @@ int main(int argc, char **argv){
         QDPIO::cout << "#             Use that propagator (and the original propagator) to build the pion and nucleon correlators." << std::endl;                    
                     
                     LatticeComplex pion_A = - trace( all_from_W_all_from_point * adj(all_from_point) );
+                    
+                    // TODO: compute the nucleon FH wick contractions, shift in time, and write out below
                     
         QDPIO::cout << "#             This yields full-volume correlators, " << std::endl;
         QDPIO::cout << "#                  <   destroyed at every spacetime location" << std::endl;
