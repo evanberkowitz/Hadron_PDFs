@@ -92,30 +92,32 @@
     </FermionAction>
 
     <Inverter>
-        <HighPrecision>
-            <invType>CG_INVERTER</invType>
-            <RsdCG> 1e-12 </RsdCG>
-            <MaxCG> 100 </MaxCG>
-            <CloverParams>
-                <Mass>-0.0743</Mass>
-                <clovCoeffR>1.58932722549812</clovCoeffR>
-                <clovCoeffT>0.902783591772098</clovCoeffT>
-                <AnisoParam>
-                    <anisoP>true</anisoP>
-                    <t_dir>3</t_dir>
-                    <xi_0>4.3</xi_0>
-                    <nu>1.265</nu>
-                </AnisoParam>
-            </CloverParams>
-            <RsdTarget>1.0e-12</RsdTarget>
-            <Delta>0.1</Delta>
-            <MaxIter>10000000</MaxIter>
-            <AntiPeriodicT>true</AntiPeriodicT>
-            <SolverType>BICGSTAB</SolverType>
-            <Verbose>false</Verbose>
-            <AsymmetricLinop>false</AsymmetricLinop>
-            <AxialGaugeFix>false</AxialGaugeFix>
-        </HighPrecision>
+        <light>
+            <HighPrecision>
+                <invType>CG_INVERTER</invType>
+                <RsdCG> 1e-12 </RsdCG>
+                <MaxCG> 100 </MaxCG>
+                <CloverParams>
+                    <Mass>-0.0743</Mass>
+                    <clovCoeffR>1.58932722549812</clovCoeffR>
+                    <clovCoeffT>0.902783591772098</clovCoeffT>
+                    <AnisoParam>
+                        <anisoP>true</anisoP>
+                        <t_dir>3</t_dir>
+                        <xi_0>4.3</xi_0>
+                        <nu>1.265</nu>
+                    </AnisoParam>
+                </CloverParams>
+                <RsdTarget>1.0e-12</RsdTarget>
+                <Delta>0.1</Delta>
+                <MaxIter>10000000</MaxIter>
+                <AntiPeriodicT>true</AntiPeriodicT>
+                <SolverType>BICGSTAB</SolverType>
+                <Verbose>false</Verbose>
+                <AsymmetricLinop>false</AsymmetricLinop>
+                <AxialGaugeFix>false</AxialGaugeFix>
+            </HighPrecision>
+        </light>
     </Inverter>
 
 </Hadron_PDFs>
