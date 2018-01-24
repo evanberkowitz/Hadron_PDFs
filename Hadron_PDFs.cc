@@ -106,7 +106,7 @@ int main(int argc, char **argv){
     QDPIO::cout << "done!" << std::endl;
     
     QDPIO::cout << "Reading high precision inverter..." << std::flush;
-    XMLReader read_solver(XML, "/Hadron_PDFs/Inverter");
+    XMLReader read_solver(XML, "/Hadron_PDFs/Inverter/light");
     GroupXML_t Solver_Parameters = readXMLGroup(read_solver, "HighPrecision", "invType");
     QDPIO::cout << "done!" << std::endl;
     
@@ -160,6 +160,7 @@ int main(int argc, char **argv){
     H5.set_stripesize(STRIPE);
     H5.mkdir("/propagators");
     H5.mkdir("/pions");
+    H5.mkdir("/nucleons");
 #ifdef DEBUG
     H5.mkdir("/transporters");
 #endif
@@ -200,7 +201,7 @@ int main(int argc, char **argv){
         QDPIO::cout << "#         Write out the correlators and the propagator (only keep the current propagator)." << std::endl;
                 H5.write("/pions/piPlus(all)_piPlus("+source+")", pion_shifted, HDF5Base::trunc);
                 
-        QDPIO::cout << "#         For each operator (photon, wilson_line, photon)" << std::endl;
+        QDPIO::cout << "#         For each operator (photon, gamma, wilson_line, photon)" << std::endl;
                 for(unsigned int o=0; o < operators.size(); o++)
                 {
                     LatticePropagator temp=zero;
