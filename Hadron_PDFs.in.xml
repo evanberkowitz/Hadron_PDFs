@@ -32,6 +32,24 @@
     </source>
 
     <operators>
+        <annotation>
+            <explanation>
+                We want to evaluate matrix elements of operators like
+                
+                qbar(x) e^{i p2 x} gamma W(x, x+dx) e^{i p1 (x+dx)} q(x+dx)
+                
+                Each photon gets a four-vector of integers which specifies the spacetime momentum.
+                The path is specified by semicolon-separated lists of colon-separated pairs of integers.
+                    The first integer in a pair specifies the direction, the second specifies how many steps.
+                The gamma matrix gets multiplied in too.
+            </explanation>
+            <elem>
+                <first_photon>px py pz pt</first_photon>
+                <path>direction:steps;direction:steps;direction:steps;</path>
+                <gamma>an integer 0 to 15, according to QDP's convention.</gamma>
+                <second_photon>px py pz pt</second_photon>
+            </elem>
+        </annotation>
         <elem><first_photon>0 0 0 0</first_photon><path>1:0;</path><gamma>8</gamma><second_photon>0 0 0 0</second_photon></elem>
         <elem><first_photon>0 0 0 0</first_photon><path>2:-2;</path><gamma>8</gamma><second_photon>0 0 0 0</second_photon></elem>
         <elem><first_photon>0 0 0 0</first_photon><path>2:-1;</path><gamma>8</gamma><second_photon>0 0 0 0</second_photon></elem>
