@@ -1,38 +1,17 @@
 #include "Hadron_PDFs.h"
 #include "standard_includes.h"
+#include "include/PointSource.h"
+#include "io/parameters/wilson_line.h"
 #include "include/ParallelTransporter.h"
 #include "include/Photon.h"
 
+
 // #include "include/SpinBasis.h"
-#include "include/Action.h"
-#include "include/Solver.h"
+// #include "include/Action.h"
+// #include "include/Solver.h"
 
 #define FERMION  LatticeFermion, multi1d<LatticeColorMatrix>, multi1d<LatticeColorMatrix>
 #define STRIPE   8388608 // 8 MB
-
-struct wilson_line_operator{
-    multi1d<int> first_photon;
-    std::string  path;
-    int gamma;
-    multi1d<int> second_photon;
-};
-
-void read(XMLReader &xml_input, const std::string &path, wilson_line_operator &o){
-    QDPIO::cout << "\nReading in wilson line operator..." << std::endl;
-    read(xml_input, path+"/first_photon",   o.first_photon);
-    read(xml_input, path+"/path",           o.path);
-    read(xml_input, path+"/gamma",          o.gamma);
-    read(xml_input, path+"/second_photon",  o.second_photon);
-    
-    QDPIO::cout << "First photon:  " << std::flush;
-    for(unsigned int i=0; i < o.first_photon.size() ; i++) QDPIO::cout << o.first_photon[i] << " " << std::flush;
-    QDPIO::cout << std::endl;
-    QDPIO::cout << "Path:          " << o.path << std::endl;
-    QDPIO::cout << "Gamma matrix:  " << o.gamma << std::endl;
-    QDPIO::cout << "Second photon: " << std::flush;
-    for(unsigned int i=0; i < o.second_photon.size() ; i++) QDPIO::cout << o.second_photon[i] << " " << std::flush;
-    QDPIO::cout << std::endl;
-}
 
 
 int main(int argc, char **argv){

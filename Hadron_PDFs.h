@@ -4,7 +4,6 @@
 #include "version.h"
 #include "standard_includes.h"
 #include "io/parameters/lattice.h"
-#include "include/PointSource.h"
 
 #include "actions/ferm/invert/syssolver_linop_cg.h"
 
